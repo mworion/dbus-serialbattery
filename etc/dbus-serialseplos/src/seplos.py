@@ -3,97 +3,18 @@ from battery import Protection, Battery, Cell
 from utils import logger
 import utils
 import serial
-import logging
-
-logger.setLevel(logging.DEBUG)
+from seplos_protocol import SeplosProtocol
 
 
 class Seplos(Battery):
+    BATTERYTYPE = "Seplos"
+
+    COMMAND_PROTOCOL_VERSION = 0x4F
+    COMMAND_VENDOR_INFO = 0x51
     def __init__(self, port, baud, address=0x00):
         super(Seplos, self).__init__(port, baud, address)
         self.type = self.BATTERYTYPE
         self.poll_interval = 5000
-
-    BATTERYTYPE = "Seplos"
-
-    COMMAND_STATUS = 0x42
-    COMMAND_ALARM = 0x44
-    COMMAND_PROTOCOL_VERSION = 0x4F
-    COMMAND_VENDOR_INFO = 0x51
-
-    @staticmethod
-    def int_from_1byte_hex_ascii(data: bytes, offset: int, signed=False):
-        return int.from_bytes(
-            bytes.fromhex(data[offset : offset + 2].decode("ascii")),
-            byteorder="big",
-            signed=signed,
-        )
-
-    @staticmethod
-    def int_from_2byte_hex_ascii(data: bytes, offset: int, signed=False):
-        return int.from_bytes(
-            bytes.fromhex(data[offset : offset + 4].decode("ascii")),
-            byteorder="big",
-            signed=signed,
-        )
-
-    @staticmethod
-    def get_checksum(frame: bytes) -> int:
-        """implements the Seplos checksum algorithm, returns 4 bytes"""
-        checksum = 0
-        for b in frame:
-            checksum += b
-        checksum %= 0xFFFF
-        checksum ^= 0xFFFF
-        checksum += 1
-        return checksum
-
-    @staticmethod
-    def get_info_length(info: bytes) -> int:
-        """implements the Seplos checksum for the info length"""
-        lenid = len(info)
-        if lenid == 0:
-            return 0
-
-        lchksum = (lenid & 0xF) + ((lenid >> 4) & 0xF) + ((lenid >> 8) & 0xF)
-        lchksum %= 16
-        lchksum ^= 0xF
-        lchksum += 1
-
-        return (lchksum << 12) + lenid
-
-    @staticmethod
-    def encode_cmd(address: int, cid2: int, info: bytes = b"") -> bytes:
-        """encodes a command sent to a battery (cid1=0x46)"""
-        cid1 = 0x46
-
-        info_length = Seplos.get_info_length(info)
-
-        frame = "{:02X}{:02X}{:02X}{:02X}{:04X}".format(
-            0x20, address, cid1, cid2, info_length
-        ).encode()
-        frame += info
-
-        checksum = Seplos.get_checksum(frame)
-        encoded = b"~" + frame + "{:04X}".format(checksum).encode() + b"\r"
-        return encoded
-
-    def test_connection(self):
-        # call a function that will connect to the battery, send a command and retrieve the result.
-        # The result or call should be unique to this BMS. Battery name or version, etc.
-        # Return True if success, False for failure
-        result = False
-        try:
-            result = self.read_status_data()
-        except Exception as err:
-            logger.error(f"Unexpected {err=}, {type(err)=}")
-            result = False
-
-        # give the user a feedback that no BMS was found
-        if not result:
-            logger.error(">>> ERROR: No reply - returning")
-
-        return result
 
     def get_settings(self):
         # After successful connection get_settings will be called to set up the battery.
@@ -129,22 +50,6 @@ class Seplos(Battery):
         if data_byte & (1 << warn_bit) != 0:
             return Protection.WARNING
         return Protection.OK
-
-    def read_alarm_data(self):
-        logger.debug("read alarm data")
-        data = self.read_serial_data_seplos(
-            self.encode_cmd(address=0x00, cid2=self.COMMAND_ALARM, info=b"01")
-        )
-        # check if we could successfully read data and we have the expected length of 98 bytes
-        if data is False or len(data) != 98:
-            return False
-
-        try:
-            logger.debug("alarm info raw {}".format(data))
-            return self.decode_alarm_data(bytes.fromhex(data.decode("ascii")))
-        except (ValueError, UnicodeDecodeError) as e:
-            logger.warning("could not hex-decode raw alarm data", exc_info=e)
-            return False
 
     def decode_alarm_data(self, data: bytes):
         logger.debug("alarm info decoded {}".format(data))
@@ -194,22 +99,6 @@ class Seplos(Battery):
         switch_byte = data[35]
         self.discharge_fet = True if switch_byte & 0b01 != 0 else False
         self.charge_fet = True if switch_byte & 0b10 != 0 else False
-        return True
-
-    def read_status_data(self):
-        logger.debug("read status data")
-
-        data = self.read_serial_data_seplos(
-            self.encode_cmd(address=0x00, cid2=0x42, info=b"01")
-        )
-
-        # check if reading data was successful and has the expected data length of 150 byte
-        if data is False or len(data) != 150:
-            return False
-
-        if not self.decode_status_data(data):
-            return False
-
         return True
 
     def decode_status_data(self, data):
@@ -286,32 +175,3 @@ class Seplos(Battery):
             return False
 
         return True
-
-    def read_serial_data_seplos(self, command):
-        logger.debug("read serial data seplos")
-
-        with serial.Serial(self.port, baudrate=self.baud_rate, timeout=1) as ser:
-            ser.flushOutput()
-            ser.flushInput()
-            written = ser.write(command)
-            logger.debug(
-                "wrote {} bytes to serial port {}, command={}".format(
-                    written, self.port, command
-                )
-            )
-
-            data = ser.readline()
-
-            if not Seplos.is_valid_frame(data):
-                return False
-
-            length_pos = 10
-            return_data = data[length_pos + 3 : -5]
-            info_length = Seplos.int_from_2byte_hex_ascii(b"0" + data[length_pos:], 0)
-            logger.debug(
-                "returning info data of length {}, info_length is {} : {}".format(
-                    len(return_data), info_length, return_data
-                )
-            )
-
-            return return_data

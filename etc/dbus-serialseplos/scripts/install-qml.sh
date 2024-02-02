@@ -4,7 +4,6 @@
 #set -x
 
 # elaborate version string for better comparing
-# https://github.com/kwindrem/SetupHelper/blob/ebaa65fcf23e2bea6797f99c1c41174143c1153c/updateFileSets#L56-L81
 function versionStringToNumber ()
 {
     local p4="" ; local p5="" ; local p5=""
