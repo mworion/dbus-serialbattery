@@ -3,6 +3,9 @@ from battery import Protection, Battery, Cell
 from utils import logger
 import utils
 import serial
+import logging
+
+logger.setLevel(logging.DEBUG)
 
 
 class Seplos(Battery):
