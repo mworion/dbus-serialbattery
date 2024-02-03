@@ -7,13 +7,15 @@ from seplos_protocol import encode_cmd
 
 
 class Comm:
-    COMMAND_STAT = 0x42
-    COMMAND_STAT_LENGTH = 168
-    COMMAND_ALARM = 0x44
-    COMMAND_ALARM_LENGTH = 98
+    TELEMETRY = 0x42
+    TELEMETRY_LENGTH = 150
+    ALARM = 0x44
+    ALARM_LENGTH = 98
+    NUMBER_OF_RETRIES = 5
 
-    def __init__(self, connection: serial.Serial):
+    def __init__(self, connection: serial.Serial, address: int = 0):
         self.connection = connection
+        self.address = address
 
     def test_connection(self):
         """
@@ -33,37 +35,43 @@ class Comm:
     def read_serial_data(self, command, response_length=0):
         """
         """
+        retries = self.NUMBER_OF_RETRIES
         self.connection.flushOutput()
         self.connection.flushInput()
-        self.connection.write(command)
-        time.sleep(0.1)
-        data = self.connection.readline()
 
-        if not is_valid_hex_string(data):
-            return False
-        if not is_valid_frame(data):
-            return False
-        if not is_valid_length(data, response_length):
-            return False
+        while retries > 0:
+            self.connection.write(command)
+            time.sleep(0.1)
+            data_raw = self.connection.read_until(b'\r')
+            data = data_raw[13: -5]
 
-        length_pos = 10
-        return_data = data[length_pos + 3: -5]
-        return return_data
+            if ((is_valid_length(data, response_length) and
+                    is_valid_hex_string(data)) and
+                    is_valid_frame(data=data_raw)):
+                break
+            retries -= 1
+
+        if retries != 0:
+            return data
+        else:
+            return False
 
     def read_alarm_data(self):
         """
         """
-        command = encode_cmd(address=0x00, cid2=self.COMMAND_ALARM, info=b"01")
-        data = self.read_serial_data(command, self.COMMAND_ALARM_LENGTH)
+        info = f'{self.address:02X}'.encode()
+        command = encode_cmd(address=self.address, cid2=self.ALARM, info=info)
+        data = self.read_serial_data(command, self.ALARM_LENGTH)
         if not data:
             return False
         return data
 
-    def read_status_data(self):
+    def read_telemetry_data(self):
         """
         """
-        command = encode_cmd(address=0x00, cid2=self.COMMAND_STAT, info=b"01")
-        data = self.read_serial_data(command, self.COMMAND_STAT_LENGTH)
+        info = f'{self.address:02X}'.encode()
+        command = encode_cmd(address=self.address, cid2=self.TELEMETRY, info=info)
+        data = self.read_serial_data(command, self.TELEMETRY_LENGTH)
         if not data:
             return False
         return data

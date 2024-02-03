@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-class Telecommand(object):
+class Alarm(object):
     """
     This class holds warnings and alarm states for different types of checks
     They are of type integer,

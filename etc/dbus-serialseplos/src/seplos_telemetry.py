@@ -63,7 +63,7 @@ class Telemetry(object):
         cycles_offset = 122
         soh_offset = 126
         port_voltage_offset = 130
-        number_of_cells = int_from_ascii(data=data, offset=4, size=1)
+        number_of_cells = int_from_ascii(data=data, offset=4, size=2)
 
         self.min_pack_voltage = self.MIN_CELL_VOLTAGE * number_of_cells
         self.max_pack_voltage = self.MAX_CELL_VOLTAGE * number_of_cells
