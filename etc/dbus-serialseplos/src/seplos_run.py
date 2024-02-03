@@ -13,7 +13,7 @@ def main():
 
     val_alarm = seplos_battery.comm[0].read_alarm_data()
     print(val_alarm)
-    seplos_battery.alarm.decode(val_telemetry)
+    seplos_battery.alarm.decode(val_alarm)
     print(seplos_battery.alarm.cell_equalization)
 
     val_telemetry = seplos_battery.comm[1].read_telemetry_data()
@@ -23,7 +23,7 @@ def main():
 
     val_alarm = seplos_battery.comm[1].read_alarm_data()
     print(val_alarm)
-    seplos_battery.alarm.decode(val_telemetry)
+    seplos_battery.alarm.decode(val_alarm)
     print(seplos_battery.alarm.cell_equalization)
 
 
