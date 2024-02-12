@@ -10,6 +10,7 @@ class SeplosBattery(object):
     """
     """
     BATTERY_TYPE = "Seplos"
+    HARDWARE_VERSION = 'v2'
 
     CID1 = 0x46                 # Lithium iron phosphate battery BMS
     TELEMETRY = 0x42            # Acquisition of telemetering information
@@ -21,9 +22,30 @@ class SeplosBattery(object):
         """
         """
         self.type = self.BATTERY_TYPE + f" {comm.address}"
+        self.role = "battery"
         self.comm = comm
+        self.online = True
+        self.hardware_version = self.HARDWARE_VERSION
+        self.cell_count = 16
+        self.max_battery_charge_current = 200
+        self.max_battery_discharge_current = 200
         self.alarm = Alarm()
         self.telemetry = Telemetry()
+
+    def connection_name(self) -> str:
+        """
+        """
+        return f'Serial {self.comm.address}'
+
+    def custom_name(self) -> str:
+        """
+        """
+        return f'Seplos({self.type})'
+
+    def product_name(self) -> str:
+        """
+        """
+        return f'Seplos({self.type})'
 
     def read_telemetry_data(self):
         """

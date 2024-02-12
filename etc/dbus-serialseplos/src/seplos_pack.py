@@ -9,25 +9,22 @@ from seplos_utils import logger
 class SeplosPack(object):
     """
     """
-
-    BATTERY_PACKS = 2
-    BATTERY_PORTS = ['/dev/tty.usbserial-B0019Z73',
-                     '/dev/tty.usbserial-B001AA8J',
-                     '/dev/tty.usbserial-VE6NMUVK',
-                     ]
     BATTERY_MASTER_BAUD = 9600
     BATTERY_SLAVE_BAUD = 19200
-    POLL_INTERVAL = 5000
+    POLL_INTERVAL = 3000
 
-    def __init__(self) -> None:
+    def __init__(self, number_packs: int, battery_ports: list) -> None:
         """
         """
+        self.number_packs = number_packs
+        self.battery_ports = battery_ports
         self.seplos_batteries = []
         self.setup_batteries()
         self.pos_master = -1
         self.pos_slave = -1
 
-    def test_and_add_battery(self, serial_if: serial.Serial, address: int = 0):
+    def test_and_add_battery(self, serial_if: serial.Serial,
+                             address: int = 0) -> bool:
         """
         """
         comm = Comm(serial_if, address)
@@ -39,10 +36,10 @@ class SeplosPack(object):
             logger.debug(f"Failed to connect to battery {address}")
         return test_result
 
-    def check_master(self):
+    def check_master(self) -> int:
         """
         """
-        for index, port in enumerate(self.BATTERY_PORTS):
+        for index, port in enumerate(self.battery_ports):
             if os.path.exists(port):
                 logger.info(f"Test battery at {port}")
                 serial_if = serial.Serial(port=port,
@@ -55,14 +52,14 @@ class SeplosPack(object):
             return -1
         return index
 
-    def check_slave_port(self, port: str):
+    def check_slave_port(self, port: str) -> bool:
         """
         """
         logger.debug(f"Test battery at {port}")
         serial_if = serial.Serial(port=port,
                                   baudrate=self.BATTERY_SLAVE_BAUD,
                                   timeout=1)
-        for i in range(1, self.BATTERY_PACKS):
+        for i in range(1, self.number_packs):
             if self.test_and_add_battery(serial_if, address=i):
                 break
         else:
@@ -70,10 +67,10 @@ class SeplosPack(object):
             return False
         return True
 
-    def check_slaves(self):
+    def check_slaves(self) -> int:
         """
         """
-        for index, port in enumerate(self.BATTERY_PORTS):
+        for index, port in enumerate(self.battery_ports):
             if index == self.pos_master:
                 logger.debug(f"Skip master battery at {index}")
                 continue
@@ -84,7 +81,7 @@ class SeplosPack(object):
             return -1
         return index
 
-    def setup_batteries(self):
+    def setup_batteries(self) -> None:
         """
         """
         self.pos_master = self.check_master()
@@ -92,11 +89,11 @@ class SeplosPack(object):
             logger.error(f"Master battery not found")
         else:
             logger.info(f"Master battery found at"
-                        f" {self.BATTERY_PORTS[self.pos_master]}")
+                        f" {self.battery_ports[self.pos_master]}")
 
         self.pos_slave = self.check_slaves()
         if self.pos_slave == -1:
             logger.error(f"Slave battery not found")
         else:
             logger.info(f"Slave battery found at"
-                        f" {self.BATTERY_PORTS[self.pos_master]}")
+                        f" {self.battery_ports[self.pos_master]}")

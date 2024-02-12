@@ -2,27 +2,22 @@
 import sys
 import os
 import platform
-import dbus  # pyright: ignore[reportMissingImports]
+import dbus
 import traceback
 from time import time
+from vedbus import VeDbusService
+from settingsdevice import SettingsDevice
+from utils import logger, publish_config_variables
+import utils
 
 # Victron packages
-sys.path.insert(
-    1,
-    os.path.join(
-        os.path.dirname(__file__),
-        "/opt/victronenergy/dbus-systemcalc-py/ext/velib_python",
-    ),
-)
-from vedbus import VeDbusService  # noqa: E402 # pyright: ignore[reportMissingImports]
-from settingsdevice import (  # noqa: E402 # pyright: ignore[reportMissingImports]
-    SettingsDevice,
-)
-from utils import logger, publish_config_variables  # noqa: E402
-import utils  # noqa: E402
+sys.path.insert(1, os.path.join(os.path.dirname(__file__),
+                "/opt/victronenergy/dbus-systemcalc-py/ext/velib_python"))
 
 
 def get_bus():
+    """
+    """
     return (
         dbus.SessionBus()
         if "DBUS_SESSION_BUS_ADDRESS" in os.environ
@@ -31,7 +26,11 @@ def get_bus():
 
 
 class DbusHelper:
+    """
+    """
     def __init__(self, battery):
+        """
+        """
         self.battery = battery
         self.instance = 1
         self.settings = None
@@ -44,8 +43,8 @@ class DbusHelper:
         )
 
     def setup_instance(self):
-        # bms_id = self.battery.production if self.battery.production is not None else \
-        #     self.battery.port[self.battery.port.rfind('/') + 1:]
+        """
+        """
         bms_id = self.battery.port[self.battery.port.rfind("/") + 1 :]
         path = "/Settings/Devices/serialbattery"
         default_instance = "battery:1"
