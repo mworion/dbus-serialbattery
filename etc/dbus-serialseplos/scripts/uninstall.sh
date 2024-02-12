@@ -4,13 +4,11 @@
 #set -x
 
 # disable driver
-bash /data/etc/dbus-serialseplos/scripts/disable.sh
+bash /data/etc/dbus-seplos/scripts/disable.sh
 
-# remove files in Victron directory. Don't use variables here,
-# since on an error the whole /opt/victronenergy gets deleted
-rm -rf /opt/victronenergy/service/dbus-serialseplos
-rm -rf /opt/victronenergy/service-templates/dbus-serialseplos
-rm -rf /opt/victronenergy/dbus-serialseplos
+rm -rf /opt/victronenergy/service/dbus-seplos
+rm -rf /opt/victronenergy/service-templates/dbus-seplos
+rm -rf /opt/victronenergy/dbus-seplos
 
 # restore GUI changes
 /data/etc/dbus-serialseplos/scripts/restore-gui.sh
@@ -19,4 +17,4 @@ rm -rf /opt/victronenergy/dbus-serialseplos
 pip3 uninstall bleak
 pip3 uninstall python-can
 opkg remove python3-pip python3-modules
-rm -rf /data/etc/dbus-serialseplos
+rm -rf /data/etc/dbus-seplos

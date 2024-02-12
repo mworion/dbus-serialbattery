@@ -4,4 +4,4 @@
 #set -x
 
 # kill driver, if running. It gets restarted by the service daemon
-pkill -f "python .*/src/dbus-serialseplos.py"
+pkill -f "python .*/src/dbus-seplos.py"

@@ -8,7 +8,7 @@
 # extract driver
 if [ -f "/tmp/venus-data.tar.gz" ]; then
     # remove old driver
-    rm -rf /data/etc/dbus-serialseplos
+    rm -rf /data/etc/dbus-seplos
     tar -zxf /tmp/venus-data.tar.gz -C /data
 else
     echo "There is no file in \"venus-data.tar.gz\""
@@ -17,4 +17,4 @@ fi
 
 
 # run install script >= v1.0.0
-bash /data/etc/dbus-serialseplos/scripts/reinstall-local.sh
+bash /data/etc/dbus-seplos/scripts/reinstall-local.sh

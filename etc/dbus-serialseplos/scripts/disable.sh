@@ -6,29 +6,16 @@
 # handle read only mounts
 bash /opt/victronenergy/swupdate-scripts/remount-rw.sh
 
-# remove driver from serial starter
-rm -f /data/conf/serial-starter.d/dbus-serialseplos.conf
-# remove serial-starter.d if empty
-rmdir /data/conf/serial-starter.d >/dev/null 2>&1
-# kill serial starter, to reload changes
-pkill -f "/opt/victronenergy/serial-starter/serial-starter.sh"
-
 # remove services
-rm -rf /service/dbus-serialseplos.*
-rm -rf /service/dbus-blebattery.*
-rm -rf /service/dbus-canbattery.*
+rm -rf /service/dbus-seplos.*
 
 # kill driver, if running
-# serial
-pkill -f "supervise dbus-serialseplos.*"
-pkill -f "multilog .* /var/log/dbus-serialseplos.*"
-pkill -f "python .*/dbus-serialseplos.py /dev/tty.*"
+pkill -f "supervise dbus-seplos.*"
+pkill -f "multilog .* /var/log/dbus-seplos.*"
+pkill -f "python .*/dbus-seplos.py"
 
 # remove install script from rc.local
-sed -i "/bash \/data\/etc\/dbus-serialseplos\/reinstall-local.sh/d" /data/rc.local
+sed -i "/bash \/data\/etc\/dbus-seplos\/reinstall-local.sh/d" /data/rc.local
 
-# remove cronjob
-sed -i "/5 0,12 \* \* \* \/etc\/init.d\/bluetooth restart/d" /var/spool/cron/root >/dev/null 2>&1
-
-echo "The dbus-serialseplos driver was disabled".
+echo "The dbus-seplos driver was disabled".
 echo
