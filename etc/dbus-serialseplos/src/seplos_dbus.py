@@ -9,6 +9,7 @@ from seplos_pack import SeplosPack
 BATTERY_PACKS = 2
 BATTERY_PORTS = ['/dev/tty.usbserial-B0019Z73',
                  '/dev/tty.usbserial-B001AA8J',
+                 '/dev/tty.usbserial-VE6NMUVK',
                  'ttyUSB0',
                  'ttyUSB1',
                  'ttyUSB2',
@@ -29,7 +30,8 @@ def main():
     if not helper.setup_vedbus():
         sys.exit(1)
 
-    gobject.timeout_add(seplos_pack.POLL_INTERVAL, lambda: helper.publish_battery(loop))
+    gobject.timeout_add(seplos_pack.POLL_INTERVAL,
+                        lambda: helper.publish_battery_pack(loop))
 
     try:
         loop.run()

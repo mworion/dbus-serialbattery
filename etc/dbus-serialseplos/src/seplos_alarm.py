@@ -8,6 +8,7 @@ class Alarm(object):
     def __init__(self):
         """
         """
+        self.number_of_cells: int = 0
         # equalization status
         self.cell_voltage_warning = [None] * 16
         self.cell_temperature_warning = [None] * 4
@@ -145,6 +146,7 @@ class Alarm(object):
         warning_8_alarm_byte_offset = 42
 
         # info data
+        self.number_of_cells = number_of_cells
         for i in range(number_of_cells):
             self.cell_voltage_warning[i] = self.stat_24byte_alarm(
                 data=data, offset=cell_warning_byte_offset + i)

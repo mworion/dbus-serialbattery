@@ -3,6 +3,8 @@ import logging
 import time
 import datetime
 
+DRIVER_VERSION = '0.1.0'
+
 logging.Formatter.converter = time.gmtime
 timeTag = datetime.datetime.utcnow().strftime('%Y-%m-%d')
 logging.basicConfig(level=logging.WARNING,

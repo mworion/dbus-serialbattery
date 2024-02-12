@@ -12,9 +12,9 @@ class Telemetry(object):
         # from pack
 
         self.cell_voltage = [None] * 16
-        self.cell_temperature: float = [None] * 4
-        self.ambient_temperature: float = None
-        self.components_temperature: float = None
+        self.temperature = [None] * 4
+        self.environ_temperature: float = None
+        self.power_temperature: float = None
         self.dis_charge_current: float = None
         self.total_pack_voltage: float = None
         self.residual_capacity: float = None
@@ -29,23 +29,37 @@ class Telemetry(object):
 
         self.average_cell_voltage: float = None
         self.delta_cell_voltage: float = None
-        self.lowest_cell: int = None
+        self.lowest_cell_vid: int = None
         self.lowest_cell_voltage: float = None
-        self.highest_cell: int = None
+        self.highest_cell_vid: int = None
         self.highest_cell_voltage: float = None
+        self.lowest_cell_temperature: int = None
+        self.lowest_cell_voltage: float = None
+        self.highest_cell_tid: int = None
+        self.highest_cell_temperature: float = None
         self.min_pack_voltage: float = None
         self.max_pack_voltage: float = None
         self.dis_charge_power: float = None
 
-    def get_lowest_cell(self) -> dict:
+    def get_lowest_cell_voltage(self) -> tuple:
         lowest_cell = self.cell_voltage.index(min(self.cell_voltage))
         lowest_cell_voltage = self.cell_voltage[lowest_cell]
         return lowest_cell, lowest_cell_voltage
 
-    def get_highest_cell(self) -> dict:
+    def get_highest_cell_voltage(self) -> tuple:
         highest_cell = self.cell_voltage.index(max(self.cell_voltage))
         highest_cell_voltage = self.cell_voltage[highest_cell]
         return highest_cell, highest_cell_voltage
+
+    def get_lowest_cell_temperature(self) -> tuple:
+        lowest_cell = self.temperature.index(min(self.temperature))
+        lowest_cell_temp = self.cell_voltage[lowest_cell]
+        return lowest_cell, lowest_cell_temp
+
+    def get_highest_cell_temperature(self) -> tuple:
+        highest_cell = self.temperature.index(max(self.temperature))
+        highest_cell_temp = self.temperature[highest_cell]
+        return highest_cell, highest_cell_temp
 
     def decode_data(self, data) -> None:
         """
@@ -74,16 +88,16 @@ class Telemetry(object):
         self.average_cell_voltage = round((sum(self.cell_voltage)
                                            / len(self.cell_voltage)), 3)
 
-        self.lowest_cell, self.lowest_cell_voltage = self.get_lowest_cell()
-        self.highest_cell, self.highest_cell_voltage = self.get_highest_cell()
+        self.lowest_cell_vid, self.lowest_cell_voltage = self.get_lowest_cell_voltage()
+        self.highest_cell_vid, self.highest_cell_voltage = self.get_highest_cell_voltage()
         self.delta_cell_voltage = round((self.highest_cell_voltage - self.lowest_cell_voltage), 3)
 
         for i in range(0, 4):
             temp = (int_from_ascii(data, temps_offset + i * 4) - 2731) / 10
-            self.cell_temperature[i] = temp
+            self.temperature[i] = temp
 
-        self.ambient_temperature = (int_from_ascii(data, temps_offset + 4 * 4) - 2731) / 10
-        self.components_temperature = (int_from_ascii(data, temps_offset + 5 * 4) - 2731) / 10
+        self.environ_temperature = (int_from_ascii(data, temps_offset + 4 * 4) - 2731) / 10
+        self.power_temperature = (int_from_ascii(data, temps_offset + 5 * 4) - 2731) / 10
         self.dis_charge_current = int_from_ascii(data, dis_charge_current_offset, signed=True) / 100
         self.total_pack_voltage = int_from_ascii(data, total_pack_voltage_offset) / 100
         self.dis_charge_power = round((self.dis_charge_current * self.total_pack_voltage), 3)

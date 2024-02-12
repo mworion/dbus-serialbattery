@@ -26,7 +26,6 @@ class SeplosBattery(object):
         self.comm = comm
         self.online = True
         self.hardware_version = self.HARDWARE_VERSION
-        self.cell_count = 16
         self.max_battery_charge_current = 200
         self.max_battery_discharge_current = 200
         self.alarm = Alarm()
@@ -38,6 +37,11 @@ class SeplosBattery(object):
         return f'Serial {self.comm.address}'
 
     def custom_name(self) -> str:
+        """
+        """
+        return f'Seplos({self.type})'
+
+    def unique_identifier(self) -> str:
         """
         """
         return f'Seplos({self.type})'
