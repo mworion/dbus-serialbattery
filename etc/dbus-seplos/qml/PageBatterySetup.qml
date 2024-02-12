@@ -4,7 +4,7 @@ import "utils.js" as Utils
 
 MbPage {
     id: root
-    property string bindPrefix: "com.victronenergy.settings//Settings/Devices/serialbattery/"
+    property string bindPrefix: "com.victronenergy.settings//Settings/Devices/seplos/"
 
     property VBusItem cellVoltageMin: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/CellVoltageMin")}
     property VBusItem cellVoltageMax: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/CellVoltageMax")}

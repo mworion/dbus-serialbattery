@@ -51,23 +51,5 @@ MbPage {
                         ]
                 }
 
-                MbItemNoYes {
-                        description: qsTr("Bluetooth Enabled")
-                        bind: Utils.path(bindPrefix, "/Settings/BluetoothMode")
-                        show: valid
-                }
-
-        
-                MbSpinBox {
-                        description: "Reset SoC to"
-                        item.bind: Utils.path(bindPrefix, "/Settings/ResetSoc")
-                        item.min: 0
-                        item.max: 100
-                        item.step: 1
-                }
-
-
-
-
         }
 }
