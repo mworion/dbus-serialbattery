@@ -1,6 +1,24 @@
 # -*- coding: utf-8 -*-
 from seplos_utils import logger
 
+COMMAND_PROTOCOL_VERSION = 0x4F
+COMMAND_VENDOR_INFO = 0x51
+
+RETURN_CODE_CID2 = {
+    0x00: 'No error',
+    0x01: 'VER error',
+    0x02: 'CHKSUM error',
+    0x03: 'LCHKSUM error',
+    0x04: 'CID2 invalid',
+    0x05: 'Command format error',
+    0x06: 'Data invalid (parameter setting)',
+    0x07: 'No data (history)',
+    0xE1: 'CID1 invalid',
+    0xE2: 'Command execution failure',
+    0xE3: 'Device fault',
+    0xE4: 'Invalid permissions',
+}
+
 
 def int_from_ascii(data: bytes, offset: int, signed=False, size=4) -> int:
     """
@@ -44,15 +62,21 @@ def is_valid_frame(data: bytes) -> bool:
     * also checks for error code as return code in cid2
     * not checked: lchksum
     """
+    cid2 = data[7:9]
+    if cid2 == b'04':
+        return True
+
     if len(data) < 18:
+        logger.debug(f"Frame too short")
         return False
 
     checksum = get_checksum(data[1:-5])
     if checksum != int_from_ascii(data, offset=-5, size=4):
+        logger.debug(f"Checksum error")
         return False
 
-    cid2 = data[7:9]
     if cid2 != b'00':
+        logger.debug(f"Error: {RETURN_CODE_CID2[int(cid2, 16)]}")
         return False
 
     return True
@@ -87,11 +111,10 @@ def get_info_length(info: bytes) -> int:
     return (lchksum << 12) + lenid
 
 
-def encode_cmd(address: int, cid2: int, info: bytes = b'00') -> bytes:
+def encode_cmd(address: int, cid1: int, cid2: int, info: bytes = b'00') -> bytes:
     """
     encodes a command sent to a battery (cid1=0x46)
     """
-    cid1 = 0x46
     info_length = get_info_length(info)
     frame = f'{0x20:02X}{address:02X}{cid1:02X}{cid2:02X}{info_length:04X}'.encode()
     frame += info

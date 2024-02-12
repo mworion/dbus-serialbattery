@@ -4,7 +4,6 @@ from seplos_protocol import int_from_ascii
 
 class Telemetry(object):
     """
-    This class holds Warning, Protection, Normal, On and Off states for different types of Checks
     """
     MIN_CELL_VOLTAGE = 2.5
     MAX_CELL_VOLTAGE = 3.6
@@ -48,7 +47,7 @@ class Telemetry(object):
         highest_cell_voltage = self.cell_voltage[highest_cell]
         return highest_cell, highest_cell_voltage
 
-    def decode(self, data) -> None:
+    def decode_data(self, data) -> None:
         """
         """
         # data offsets

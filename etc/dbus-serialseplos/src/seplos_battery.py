@@ -1,45 +1,65 @@
 # -*- coding: utf-8 -*-
-import serial
 from seplos_alarm import Alarm
 from seplos_telemetry import Telemetry
 from seplos_comm import Comm
+from seplos_protocol import encode_cmd
+from seplos_utils import logger
 
 
-class SeplosBattery():
-    BATTERYTYPE = "Seplos"
-    BATTERY_PACKS = 2
-    BATTERY_MASTER_PORT = '/dev/tty.usbserial-B0019Z73'
-    BATTERY_MASTER_BAUD = 9600
-    BATTERY_SLAVE_PORT = '/dev/tty.usbserial-B001AA8J'
-    BATTERY_SLAVE_BAUD = 19200
-    COMMAND_PROTOCOL_VERSION = 0x4F
-    COMMAND_VENDOR_INFO = 0x51
+class SeplosBattery(object):
+    """
+    """
+    BATTERY_TYPE = "Seplos"
 
-    def __init__(self) -> None:
-        self.type = self.BATTERYTYPE
-        self.poll_interval = 5000
+    CID1 = 0x46                 # Lithium iron phosphate battery BMS
+    TELEMETRY = 0x42            # Acquisition of telemetering information
+    TELEMETRY_LENGTH = 150
+    ALARM = 0x44                # Acquisition of telecommand information
+    ALARM_LENGTH = 98
+
+    def __init__(self, comm: Comm) -> None:
+        """
+        """
+        self.type = self.BATTERY_TYPE + f" {comm.address}"
+        self.comm = comm
         self.alarm = Alarm()
         self.telemetry = Telemetry()
-        self.comm = [None] * self.BATTERY_PACKS
 
-        self.comm[0] = Comm(serial.Serial(port=self.BATTERY_MASTER_PORT,
-                                          baudrate=self.BATTERY_MASTER_BAUD,
-                                          timeout=1))
-        if self.BATTERY_PACKS > 1:
-            serial_if = serial.Serial(port=self.BATTERY_SLAVE_PORT,
-                                      baudrate=self.BATTERY_SLAVE_BAUD,
-                                      timeout=1)
-        for i in range(1, self.BATTERY_PACKS):
-            self.comm[i] = Comm(serial_if, address=i)
+    def read_telemetry_data(self):
+        """
+        """
+        info = f'{self.comm.address:02X}'.encode()
+        command = encode_cmd(address=self.comm.address, cid1=self.CID1,
+                             cid2=self.TELEMETRY, info=info)
+        data = self.comm.read_serial_data(command, self.TELEMETRY_LENGTH)
+        if not data:
+            logger.error(f"Failed to read telemetry data from {self.comm.address}")
+            return False
+        return data
+
+    def read_alarm_data(self):
+        """
+        """
+        info = f'{self.comm.address:02X}'.encode()
+        command = encode_cmd(address=self.comm.address, cid1=self.CID1,
+                             cid2=self.ALARM, info=info)
+        data = self.comm.read_serial_data(command, self.ALARM_LENGTH)
+        if not data:
+            logger.error(f"Failed to read alarm data from {self.comm.address}")
+            return False
+        return data
 
     def refresh_data(self):
         """
-        Call all functions that will refresh the battery data.
-        This will be called for every iteration (self.poll_interval)
-        Return True if success, False for failure
         """
-        result_alarm = self.comm.read_alarm_data()
-        self.alarm.decode(result_alarm)
-        result_telemetry = self.comm.read_telemetry_data()
-        self.telemetry.decode(result_telemetry)
-        return result_alarm and result_telemetry
+        result_alarm = self.read_alarm_data()
+        if not result_alarm:
+            return False
+        self.alarm.decode_data(result_alarm)
+
+        result_telemetry = self.read_telemetry_data()
+        if not result_telemetry:
+            return False
+        self.telemetry.decode_data(result_telemetry)
+
+        return True

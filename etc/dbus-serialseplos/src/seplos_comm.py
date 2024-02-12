@@ -6,43 +6,42 @@ from seplos_protocol import is_valid_hex_string, is_valid_frame, is_valid_length
 from seplos_protocol import encode_cmd
 
 
-class Comm:
-    TELEMETRY = 0x42
-    TELEMETRY_LENGTH = 150
-    ALARM = 0x44
-    ALARM_LENGTH = 98
+class Comm(object):
+    """
+    """
     NUMBER_OF_RETRIES = 5
 
-    def __init__(self, connection: serial.Serial, address: int = 0):
-        self.connection = connection
+    def __init__(self, serial_if: serial.Serial, address: int = 0):
+        self.serial_if = serial_if
         self.address = address
 
     def test_connection(self):
         """
-        call a function that will connect to the battery, send a command
-        and retrieve the result. The result or call should be unique to this
-        BMS. Battery name or version, etc.
-        Return True if success, False for failure
+        Calling cid2=0x00 is invalid. We wait if the result is OK.
         """
         try:
-            result = self.read_status_data()
+            command = encode_cmd(address=self.address, cid1=0x46, cid2=0x00)
+            response = self.read_serial_data(command, 0)
+        except serial.SerialTimeoutException:
+            logger.debug(f"Timeout from {self.address}")
+            return False
         except Exception as err:
-            logger.error(f"Unexpected {err=}, {type(err)=}")
-            result = False
-
-        return result
+            logger.debug(f"Unexpected {err=}")
+            return False
+        return response == b''
 
     def read_serial_data(self, command, response_length=0):
         """
         """
         retries = self.NUMBER_OF_RETRIES
-        self.connection.flushOutput()
-        self.connection.flushInput()
+        self.serial_if.flushOutput()
+        self.serial_if.flushInput()
 
+        data = None
         while retries > 0:
-            self.connection.write(command)
+            self.serial_if.write(command)
             time.sleep(0.1)
-            data_raw = self.connection.read_until(b'\r')
+            data_raw = self.serial_if.read_until(b'\r')
             data = data_raw[13: -5]
 
             if ((is_valid_length(data, response_length) and
@@ -54,24 +53,5 @@ class Comm:
         if retries != 0:
             return data
         else:
+            logger.debug(f"Exceeded retries from {self.address}")
             return False
-
-    def read_alarm_data(self):
-        """
-        """
-        info = f'{self.address:02X}'.encode()
-        command = encode_cmd(address=self.address, cid2=self.ALARM, info=info)
-        data = self.read_serial_data(command, self.ALARM_LENGTH)
-        if not data:
-            return False
-        return data
-
-    def read_telemetry_data(self):
-        """
-        """
-        info = f'{self.address:02X}'.encode()
-        command = encode_cmd(address=self.address, cid2=self.TELEMETRY, info=info)
-        data = self.read_serial_data(command, self.TELEMETRY_LENGTH)
-        if not data:
-            return False
-        return data

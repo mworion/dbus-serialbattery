@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
+
+
 class Alarm(object):
     """
-    This class holds warnings and alarm states for different types of checks
-    They are of type integer,
-    2 represents a Telecommand event,
-    1 a warning event,
-    0 if everything is fine
     """
 
     def __init__(self):
@@ -119,9 +116,10 @@ class Alarm(object):
         else:
             return "trigger_other"
 
-    def decode(self, data: bytes) -> None:
+    def decode_data(self, data: bytes) -> None:
         # number of cells
         number_of_cells = bytes.fromhex(data.decode("ascii"))[2]
+
         # info 24 byte alarm offsets
         cell_warning_byte_offset = 3
         cell_temperature_warning_byte_offset = 20
