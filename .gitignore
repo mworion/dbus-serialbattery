@@ -161,7 +161,7 @@ BMS-trials
 .project
 .pydevproject
 *.prefs
-etc/dbus-serialseplos/config.ini
+etc/dbus-seplos/config.ini
 
 # Local Clone of velib_python
 velib_python

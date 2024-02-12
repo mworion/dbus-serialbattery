@@ -6,9 +6,7 @@
 # disable driver
 bash /data/etc/dbus-seplos/scripts/disable.sh
 
-rm -rf /opt/victronenergy/service/dbus-seplos
 rm -rf /opt/victronenergy/service-templates/dbus-seplos
-rm -rf /opt/victronenergy/dbus-seplos
 
 # restore GUI changes
 /data/etc/dbus-serialseplos/scripts/restore-gui.sh
