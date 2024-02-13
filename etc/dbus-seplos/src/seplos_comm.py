@@ -6,7 +6,7 @@ from seplos_protocol import is_valid_hex_string, is_valid_frame, is_valid_length
 from seplos_protocol import encode_cmd
 
 
-class Comm(object):
+class Comm:
     """
     """
     NUMBER_OF_RETRIES = 5
@@ -34,15 +34,24 @@ class Comm(object):
         """
         """
         retries = self.NUMBER_OF_RETRIES
-        self.serial_if.flushOutput()
-        self.serial_if.flushInput()
+        # self.serial_if.close()
+        # time.sleep(0.2)
+        # self.serial_if.open()
+        # time.sleep(0.2)
 
         data = None
         while retries > 0:
-            self.serial_if.write(command)
+            self.serial_if.flushOutput()
+            self.serial_if.flushInput()
             time.sleep(0.1)
-            data_raw = self.serial_if.read_until(b'\r')
-            data = data_raw[13: -5]
+            self.serial_if.write(command)
+            try:
+                data_raw = self.serial_if.read_until(b'\r')
+                data = data_raw[13: -5]
+            except serial.serialutil.SerialException:
+                logger.debug(f"Serial exception from {self.address}")
+                data = b''
+                data_raw = b''
 
             if ((is_valid_length(data, response_length) and
                     is_valid_hex_string(data)) and

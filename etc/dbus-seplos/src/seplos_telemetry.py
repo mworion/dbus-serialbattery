@@ -2,7 +2,7 @@
 from seplos_protocol import int_from_ascii
 
 
-class Telemetry(object):
+class Telemetry:
     """
     """
     MIN_CELL_VOLTAGE = 2.5

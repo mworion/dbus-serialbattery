@@ -13,9 +13,13 @@ else
 fi
 
 # install
-rm -rf /opt/victronenergy/service-templates/dbus-seplos
+chmod +x /data/etc/dbus-seplos/scripts/*.sh
+chmod +x /data/etc/dbus-seplos/src/*.py
 cp -rf /data/etc/dbus-seplos/service /opt/victronenergy/service-templates/dbus-seplos
-bash /data/etc/dbus-seplos/install-qml.sh
+cp -rf /data/etc/dbus-seplos/scripts/dbus-seplos.conf /data/conf/serial-starter.d/dbus-seplos.conf
+
+# bash /data/etc/dbus-seplos/install-qml.sh
+
 
 # kill driver, if running. It gets restarted by the service daemon
 pkill -f "supervise dbus-seplos.*"

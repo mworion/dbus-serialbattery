@@ -9,7 +9,7 @@ bash /data/etc/dbus-seplos/scripts/disable.sh
 rm -rf /opt/victronenergy/service-templates/dbus-seplos
 
 # restore GUI changes
-/data/etc/dbus-serialseplos/scripts/restore-gui.sh
+bash /data/etc/dbus-seplos/scripts/restore-gui.sh
 
 # uninstall modules
 pip3 uninstall bleak

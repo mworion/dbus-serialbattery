@@ -6,7 +6,7 @@ from seplos_protocol import encode_cmd
 from seplos_utils import logger
 
 
-class SeplosBattery(object):
+class SeplosBattery:
     """
     """
     BATTERY_TYPE = "Seplos"
@@ -79,13 +79,11 @@ class SeplosBattery(object):
         """
         """
         result_alarm = self.read_alarm_data()
-        if not result_alarm:
-            return False
-        self.alarm.decode_data(result_alarm)
+        if result_alarm:
+            self.alarm.decode_data(result_alarm)
 
         result_telemetry = self.read_telemetry_data()
-        if not result_telemetry:
-            return False
-        self.telemetry.decode_data(result_telemetry)
+        if result_telemetry:
+            self.telemetry.decode_data(result_telemetry)
 
         return True

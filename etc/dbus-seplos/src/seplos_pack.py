@@ -6,25 +6,24 @@ from seplos_comm import Comm
 from seplos_utils import logger
 
 
-class SeplosPack(object):
+class SeplosPack:
     """
     """
     BATTERY_MASTER_BAUD = 9600
     BATTERY_SLAVE_BAUD = 19200
+    MAX_NUMBER_SLAVE_PACKS = 2
     POLL_INTERVAL = 3000
 
-    def __init__(self, number_packs: int, battery_ports: list) -> None:
+    def __init__(self, battery_port: str) -> None:
         """
         """
-        self.number_packs = number_packs
-        self.battery_ports = battery_ports
+        self.battery_port = battery_port
         self.seplos_batteries = []
-        self.setup_batteries()
         self.pos_master = -1
         self.pos_slave = -1
+        self.setup_batteries()
 
-    def test_and_add_battery(self, serial_if: serial.Serial,
-                             address: int = 0) -> bool:
+    def test_and_add_battery(self, serial_if: serial.Serial, address: int = 0) -> bool:
         """
         """
         comm = Comm(serial_if, address)
@@ -36,64 +35,44 @@ class SeplosPack(object):
             logger.debug(f"Failed to connect to battery {address}")
         return test_result
 
-    def check_master(self) -> int:
+    def check_master(self, port: str) -> bool:
         """
         """
-        for index, port in enumerate(self.battery_ports):
-            if os.path.exists(port):
-                logger.info(f"Test battery at {port}")
-                serial_if = serial.Serial(port=port,
-                                          baudrate=self.BATTERY_MASTER_BAUD,
-                                          timeout=1)
-                if self.test_and_add_battery(serial_if, address=0):
-                    break
-                serial_if.close()
-        else:
-            return -1
-        return index
+        if not os.path.exists(port):
+            return False
 
-    def check_slave_port(self, port: str) -> bool:
+        logger.info(f"Test battery at {self.battery_port}")
+        serial_if = serial.Serial(port=self.battery_port,
+                                  baudrate=self.BATTERY_MASTER_BAUD,
+                                  timeout=0.5)
+        if self.test_and_add_battery(serial_if, address=0):
+            return True
+        else:
+            serial_if.close()
+            return False
+
+    def check_slave(self) -> bool:
         """
         """
-        logger.debug(f"Test battery at {port}")
-        serial_if = serial.Serial(port=port,
+        if not os.path.exists(self.battery_port):
+            return False
+        logger.debug(f"Test battery at {self.battery_port}")
+        serial_if = serial.Serial(port=self.battery_port,
                                   baudrate=self.BATTERY_SLAVE_BAUD,
-                                  timeout=1)
-        for i in range(1, self.number_packs):
-            if self.test_and_add_battery(serial_if, address=i):
+                                  timeout=0.5)
+        for i in range(1, self.MAX_NUMBER_SLAVE_PACKS):
+            if not self.test_and_add_battery(serial_if, address=i):
                 break
         else:
             serial_if.close()
             return False
         return True
 
-    def check_slaves(self) -> int:
-        """
-        """
-        for index, port in enumerate(self.battery_ports):
-            if index == self.pos_master:
-                logger.debug(f"Skip master battery at {index}")
-                continue
-            if os.path.exists(port):
-                if self.check_slave_port(port=port):
-                    break
-        else:
-            return -1
-        return index
-
     def setup_batteries(self) -> None:
         """
         """
-        self.pos_master = self.check_master()
-        if self.pos_master == -1:
-            logger.error(f"Master battery not found")
-        else:
-            logger.info(f"Master battery found at"
-                        f" {self.battery_ports[self.pos_master]}")
+        if self.check_master():
+            logger.info(f'Master battery found at {self.battery_port}')
 
-        self.pos_slave = self.check_slaves()
-        if self.pos_slave == -1:
-            logger.error(f"Slave battery not found")
-        else:
-            logger.info(f"Slave battery found at"
-                        f" {self.battery_ports[self.pos_master]}")
+        if self.check_slave():
+            logger.info(f'Slave batteries found at {self.battery_port}')

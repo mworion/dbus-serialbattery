@@ -4,23 +4,24 @@ from dbus.mainloop.glib import DBusGMainLoop
 from gi.repository import GLib as gobject
 from seplos_dbus_helper import DbusHelper
 from seplos_pack import SeplosPack
+from seplos_utils import logger
 
 
-BATTERY_PACKS = 2
-BATTERY_PORTS = ['/dev/tty.usbserial-B0019Z73',
-                 '/dev/tty.usbserial-B001AA8J',
-                 '/dev/tty.usbserial-VE6NMUVK',
-                 'ttyUSB0',
-                 'ttyUSB1',
-                 'ttyUSB2',
-                 'ttyUSB3',
-                 ]
+def get_port() -> str:
+    """
+    """
+    if len(sys.argv) == 1:
+        logger.info(f"Getting port {sys.argv[1]}")
+        return sys.argv[1]
+    else:
+        return ''
 
 
 def main():
     """
     """
-    seplos_pack = SeplosPack(number_packs=BATTERY_PACKS, battery_ports=BATTERY_PORTS)
+    port = get_port()
+    seplos_pack = SeplosPack(battery_port=port)
     if len(seplos_pack.seplos_batteries) == 0:
         sys.exit(1)
 
