@@ -1,42 +1,45 @@
 # -*- coding: utf-8 -*-
-import time
 import sys
-from seplos_battery import SeplosBattery
+from dbus.mainloop.glib import DBusGMainLoop
+from gi.repository import GLib as gobject
+from seplos_dbus import DBUS
 from seplos_pack import SeplosPack
+from seplos_utils import logger
 
 
-BATTERY_PACKS = 2
-BATTERY_PORTS = ['/dev/ttyUSB0',
-                 '/dev/ttyUSB1',
-                 ]
-
-
-def show_data(battery: SeplosBattery):
+def get_port() -> str:
     """
     """
-    print(battery.type)
-    battery.refresh_data()
-    print(battery.telemetry.cell_voltage)
-    print(battery.alarm.cell_equalization)
+    if len(sys.argv) == 1:
+        logger.info(f"Getting port {sys.argv[1]}")
+        return sys.argv[1]
+    else:
+        return ''
 
 
 def main():
-    print('Start')
-    seplos_pack = SeplosPack(number_packs=BATTERY_PACKS, battery_ports=BATTERY_PORTS)
-
-    if len(seplos_pack.seplos_batteries) != BATTERY_PACKS:
+    """
+    """
+    port = get_port()
+    seplos_pack = SeplosPack(battery_port=port)
+    if len(seplos_pack.seplos_batteries) == 0:
+        logger.error('No batteries found')
         sys.exit(1)
 
-    for i in range(20):
-        for seplos_battery in seplos_pack.seplos_batteries:
-            show_data(seplos_battery)
-        time.sleep(1)
+    DBusGMainLoop(set_as_default=True)
+    loop = gobject.MainLoop()
+    helper = DBUS(seplos_pack)
+    if not helper.setup_vedbus():
+        logger.error('Failed to setup dbus')
+        sys.exit(1)
 
-    for seplos_battery in seplos_pack.seplos_batteries:
-        seplos_battery.comm.serial_if.close()
+    gobject.timeout_add(seplos_pack.POLL_INTERVAL,
+                        lambda: helper.publish_battery_pack(loop))
 
-    print('Batteries in pack:', len(seplos_pack.seplos_batteries))
-    print('Done')
+    try:
+        loop.run()
+    except KeyboardInterrupt:
+        pass
 
 
 if __name__ == "__main__":
