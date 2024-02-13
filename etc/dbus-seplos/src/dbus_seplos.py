@@ -2,7 +2,7 @@
 import sys
 from dbus.mainloop.glib import DBusGMainLoop
 from gi.repository import GLib as gobject
-from seplos_dbus_helper import DbusHelper
+from seplos_dbus import DBUS
 from seplos_pack import SeplosPack
 from seplos_utils import logger
 
@@ -27,7 +27,7 @@ def main():
 
     DBusGMainLoop(set_as_default=True)
     loop = gobject.MainLoop()
-    helper = DbusHelper(seplos_pack)
+    helper = DBUS(seplos_pack)
     if not helper.setup_vedbus():
         sys.exit(1)
 
