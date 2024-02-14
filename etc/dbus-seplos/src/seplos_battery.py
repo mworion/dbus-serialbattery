@@ -21,7 +21,7 @@ class SeplosBattery:
     def __init__(self, comm: Comm, port: str) -> None:
         """
         """
-        self.type = self.BATTERY_TYPE + f" {comm.address}"
+        self.type = self.BATTERY_TYPE + f"{comm.address}"
         self.port = port
         self.role = "battery"
         self.comm = comm

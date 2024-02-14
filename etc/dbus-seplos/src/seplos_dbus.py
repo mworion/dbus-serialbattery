@@ -42,7 +42,7 @@ class DBUS:
             self.settings[i] = None
             self.error[i] = {"count": 0, "timestamp_first": None, "timestamp_last": None}
             self.dbusservice[i] = VeDbusService(
-                f'com.victronenergy.battery.{battery.connection_name()}',
+                f'com.victronenergy.battery.{battery.unique_identifier()}',
                 get_bus())
 
     def setup_instance(self, battery) -> tuple:
@@ -148,7 +148,7 @@ class DBUS:
         """
         for i in range(self.number_batteries):
             self.settings[i], self.instance[i] = self.setup_instance(self.battery[i])
-            self.setup_vedbus(self.dbusservice[i], self.battery[i], self.instance[i])
+            self.setup_vedbus(dbus=self.dbusservice[i], battery=self.battery[i], instance=self.instance[i])
 
     @staticmethod
     def publish_battery(loop, battery, error):
