@@ -143,7 +143,7 @@ class DBUS:
                       gettextcallback=lambda p, v: "{:0.3f}V".format(v))
         return True
 
-    def setup_vebus_pack(self) -> None:
+    def setup_vedbus_pack(self) -> None:
         """
         """
         for i in range(self.number_batteries):
