@@ -9,7 +9,7 @@ from seplos_utils import logger
 class SeplosBattery:
     """
     """
-    BATTERY_TYPE = "Seplos"
+    BATTERY_TYPE = "seplos"
     HARDWARE_VERSION = 'v2'
 
     CID1 = 0x46                 # Lithium iron phosphate battery BMS
@@ -18,10 +18,11 @@ class SeplosBattery:
     ALARM = 0x44                # Acquisition of telecommand information
     ALARM_LENGTH = 98
 
-    def __init__(self, comm: Comm) -> None:
+    def __init__(self, comm: Comm, port: str) -> None:
         """
         """
         self.type = self.BATTERY_TYPE + f" {comm.address}"
+        self.port = port
         self.role = "battery"
         self.comm = comm
         self.online = True
@@ -34,7 +35,7 @@ class SeplosBattery:
     def connection_name(self) -> str:
         """
         """
-        return f'Serial {self.comm.address}'
+        return f'Serial{self.comm.address}'
 
     def custom_name(self) -> str:
         """
@@ -44,12 +45,12 @@ class SeplosBattery:
     def unique_identifier(self) -> str:
         """
         """
-        return f'Seplos({self.type})'
+        return f'{self.type}'
 
     def product_name(self) -> str:
         """
         """
-        return f'Seplos({self.type})'
+        return f'{self.type}'
 
     def read_telemetry_data(self):
         """

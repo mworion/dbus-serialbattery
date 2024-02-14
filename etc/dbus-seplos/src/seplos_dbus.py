@@ -5,13 +5,15 @@ import platform
 from time import time
 from typing import Union
 import dbus
+
+sys.path.insert(1, os.path.join(os.path.dirname(__file__),
+                                "/opt/victronenergy/dbus-systemcalc-py/ext/velib_python"))
+
 from vedbus import VeDbusService
 from settingsdevice import SettingsDevice
 from seplos_utils import logger, DRIVER_VERSION
 
 # Victron packages
-sys.path.insert(1, os.path.join(os.path.dirname(__file__),
-                                "/opt/victronenergy/dbus-systemcalc-py/ext/velib_python"))
 
 
 def get_bus() -> Union[dbus.SessionBus, dbus.SystemBus]:
@@ -40,7 +42,7 @@ class DBUS:
             self.settings[i] = None
             self.error[i] = {"count": 0, "timestamp_first": None, "timestamp_last": None}
             self.dbusservice[i] = VeDbusService(
-                f'com.victronenergy.battery.{battery.comm.address:02X}',
+                f'com.victronenergy.battery.{battery.connection_name()}',
                 get_bus())
 
     def setup_instance(self, battery) -> tuple:

@@ -29,18 +29,15 @@ class SeplosPack:
         comm = Comm(serial_if, address)
         test_result = comm.test_connection()
         if test_result:
-            self.seplos_batteries.append(SeplosBattery(comm))
+            self.seplos_batteries.append(SeplosBattery(comm, port=self.battery_port))
             logger.debug(f"Connected to battery {address}")
         else:
             logger.debug(f"Failed to connect to battery {address}")
         return test_result
 
-    def check_master(self, port: str) -> bool:
+    def check_master(self) -> bool:
         """
         """
-        if not os.path.exists(port):
-            return False
-
         logger.info(f"Test battery at {self.battery_port}")
         serial_if = serial.Serial(port=self.battery_port,
                                   baudrate=self.BATTERY_MASTER_BAUD,
@@ -54,8 +51,6 @@ class SeplosPack:
     def check_slave(self) -> bool:
         """
         """
-        if not os.path.exists(self.battery_port):
-            return False
         logger.debug(f"Test battery at {self.battery_port}")
         serial_if = serial.Serial(port=self.battery_port,
                                   baudrate=self.BATTERY_SLAVE_BAUD,

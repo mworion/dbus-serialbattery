@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
+import os
+import time
 from dbus.mainloop.glib import DBusGMainLoop
 from gi.repository import GLib as gobject
 from seplos_dbus import DBUS
@@ -10,7 +12,7 @@ from seplos_utils import logger
 def get_port() -> str:
     """
     """
-    if len(sys.argv) == 1:
+    if len(sys.argv) == 2:
         logger.info(f"Getting port {sys.argv[1]}")
         return sys.argv[1]
     else:
@@ -21,6 +23,11 @@ def main():
     """
     """
     port = get_port()
+    time.sleep(16)
+    if not os.path.exists(port):
+        logger.error(f'Port {port} does not exist')
+        sys.exit(1)
+
     seplos_pack = SeplosPack(battery_port=port)
     if len(seplos_pack.seplos_batteries) == 0:
         logger.error('No batteries found')

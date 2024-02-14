@@ -34,11 +34,6 @@ class Comm:
         """
         """
         retries = self.NUMBER_OF_RETRIES
-        # self.serial_if.close()
-        # time.sleep(0.2)
-        # self.serial_if.open()
-        # time.sleep(0.2)
-
         data = None
         while retries > 0:
             self.serial_if.flushOutput()
