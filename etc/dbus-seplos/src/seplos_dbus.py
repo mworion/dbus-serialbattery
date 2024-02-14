@@ -148,7 +148,7 @@ class DBUS:
         """
         for i in range(self.number_batteries):
             self.settings[i], self.instance[i] = self.setup_instance(self.battery[i])
-            self.setup_vedbus(dbus=self.dbusservice[i], battery=self.battery[i], instance=self.instance[i])
+            self.setup_vedbus(self.dbusservice[i], self.battery[i], self.instance[i])
 
     @staticmethod
     def publish_battery(loop, battery, error):

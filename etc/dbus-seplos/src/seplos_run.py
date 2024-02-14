@@ -36,7 +36,7 @@ def main():
     DBusGMainLoop(set_as_default=True)
     loop = gobject.MainLoop()
     helper = DBUS(seplos_pack)
-    if not helper.setup_vedbus():
+    if not helper.setup_vedbus_pack():
         logger.error('Failed to setup dbus')
         sys.exit(1)
 
