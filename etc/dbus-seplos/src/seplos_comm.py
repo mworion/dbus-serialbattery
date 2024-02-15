@@ -21,7 +21,7 @@ class Comm:
         """
         try:
             command = encode_cmd(address=self.address, cid1=0x46, cid2=0x00)
-            response = self.read_serial_data(command, 0)
+            response = self.read_serial_data(command, response_length=0)
         except serial.SerialTimeoutException:
             logger.debug(f"Timeout from {self.address}")
             return False
@@ -30,7 +30,7 @@ class Comm:
             return False
         return response == b''
 
-    def read_serial_data(self, command, response_length=0):
+    def read_serial_data(self, command: bytes, response_length: int):
         """
         """
         retries = self.NUMBER_OF_RETRIES
@@ -38,23 +38,30 @@ class Comm:
         while retries > 0:
             self.serial_if.flushOutput()
             self.serial_if.flushInput()
+            # logger.debug(f"Send: {command}")
             self.serial_if.write(command)
             try:
                 data_raw = self.serial_if.read_until(b'\r')
                 data = data_raw[13: -5]
-                logger.debug(f"Read {data}")
+                # logger.debug(f"Data: {data_raw}")
+
             except serial.serialutil.SerialException:
                 logger.debug(f"Serial exception from {self.address}")
-                data = b''
-                data_raw = b''
+                continue
 
-            if ((is_valid_length(data, response_length) and
-                    is_valid_hex_string(data)) and
-                    is_valid_frame(data=data_raw)):
+            else:
+                if not is_valid_frame(data=data_raw):
+                    continue
+                if not is_valid_hex_string(data):
+                    continue
+                if not is_valid_length(data, response_length):
+                    continue
                 break
-            retries -= 1
 
-        if retries != 0:
+            finally:
+                retries -= 1
+
+        if retries > 0:
             return data
         else:
             logger.debug(f"Exceeded retries from {self.address}")

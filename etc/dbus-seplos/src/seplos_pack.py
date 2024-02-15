@@ -38,30 +38,35 @@ class SeplosPack:
     def check_master(self) -> bool:
         """
         """
-        logger.debug(f"Test battery at {self.battery_port}")
+        logger.debug(f"Test master battery at {self.battery_port}")
         serial_if = serial.Serial(port=self.battery_port,
                                   baudrate=self.BATTERY_MASTER_BAUD,
-                                  timeout=1)
+                                  timeout=.5)
         if self.test_and_add_battery(serial_if, address=0):
             return True
         else:
             serial_if.close()
+            del serial_if
             return False
 
     def check_slave(self) -> bool:
         """
         """
-        logger.debug(f"Test battery at {self.battery_port}")
+        logger.debug(f"Test slave battery at {self.battery_port}")
         serial_if = serial.Serial(port=self.battery_port,
                                   baudrate=self.BATTERY_SLAVE_BAUD,
-                                  timeout=1)
-        for i in range(1, self.MAX_NUMBER_SLAVE_PACKS + 1):
-            if not self.test_and_add_battery(serial_if, address=i):
+                                  timeout=0.5)
+        slave_found = False
+        for address in range(1, self.MAX_NUMBER_SLAVE_PACKS + 1):
+            if not self.test_and_add_battery(serial_if, address=address):
                 break
+            slave_found = True
+
+        if slave_found:
+            return True
         else:
             serial_if.close()
             return False
-        return True
 
     def setup_batteries(self) -> None:
         """
@@ -69,6 +74,7 @@ class SeplosPack:
         logger.info(f'Checking batteries at {self.battery_port}')
         if self.check_master():
             logger.info(f'Master battery found at {self.battery_port}')
+            return
 
         if self.check_slave():
             logger.info(f'Slave batteries found at {self.battery_port}')

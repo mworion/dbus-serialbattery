@@ -75,7 +75,7 @@ def is_valid_frame(data: bytes) -> bool:
         return False
 
     if cid2 != b'00':
-        logger.debug(f"Error: {RETURN_CODE_CID2[int(cid2, 16)]}")
+        logger.debug(f"Error: {RETURN_CODE_CID2.get(int(cid2, 16), 'Unknown error')}")
         return False
 
     return True

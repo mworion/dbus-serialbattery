@@ -26,7 +26,7 @@ def main():
     """
     """
     port = get_port()
-    time.sleep(16)
+    time.sleep(1)
     if not os.path.exists(port):
         logger.error(f'Port {port} does not exist')
         sys.exit(1)
@@ -35,6 +35,14 @@ def main():
     if len(seplos_pack.seplos_batteries) == 0:
         logger.error('No batteries found')
         sys.exit(1)
+
+    for i in range(10):
+        for seplos_battery in seplos_pack.seplos_batteries:
+            time.sleep(1)
+            seplos_battery.refresh_data()
+            print(seplos_battery.telemetry.cell_voltage)
+
+    sys.exit(0)
 
     DBusGMainLoop(set_as_default=True)
     main_loop = gobject.MainLoop()
