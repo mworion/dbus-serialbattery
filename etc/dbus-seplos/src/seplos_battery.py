@@ -35,7 +35,7 @@ class SeplosBattery:
     def connection_name(self) -> str:
         """
         """
-        return f'Serial{self.comm.address}'
+        return self.port[self.port.rfind("/") + 1:]
 
     def custom_name(self) -> str:
         """
