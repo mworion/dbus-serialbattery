@@ -60,11 +60,11 @@ class DBUS:
             logger.info(f'Changed Instance {instance}, '
                         f'old: {old_value}, new: {new_value}')
 
-    def setup_instance(self, i:int) -> tuple:
+    def setup_instance(self, i: int) -> tuple:
         """
         """
         bms_id = self.battery[i].unique_identifier()
-        path = "/Settings/Devices/seplos"
+        path = "/Settings/Devices/Seplos"
         default_instance = 'battery:1'
         settings = {"instance": [path + "_" + str(bms_id).replace(" ", "_") + "/ClassAndVrmInstance",
                                  default_instance, 0, 0, ]}

@@ -4,35 +4,35 @@ import "utils.js" as Utils
 
 MbPage {
     id: root
-    property string bindPrefix: "com.victronenergy.settings//Settings/Devices/seplos/"
+    property string bindPrefix: "com.victronenergy.settings//Settings/Devices/Seplos/"
 
-    property VBusItem cellVoltageMin: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/CellVoltageMin")}
-    property VBusItem cellVoltageMax: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/CellVoltageMax")}
-    property VBusItem cellVoltageFloat: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/CellVoltageFloat")}
-    property VBusItem voltageMaxTime: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/VoltageMaxTime")}
-    property VBusItem voltageResetSocLimit: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/VoltageResetSocLimit")}
-    property VBusItem maxCurrentCharge: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/MaxCurrentCharge")}
-    property VBusItem maxCurrentDischarge: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/MaxCurrentDischarge")}
-    property VBusItem allowDynamicChargeCurrent: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/AllowDynamicChargeCurrent")}
-    property VBusItem allowDynamicDischargeCurrent: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/AllowDynamicDischargeCurrent")}
-    property VBusItem allowDynamicChargeVoltage: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/AllowDynamicChargeVoltage")}
-    property VBusItem socLowWarning: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/SocLowWarning")}
-    property VBusItem socLowAlarm: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/SocLowAlarm")}
-    property VBusItem capacity: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/Capacity")}
-    property VBusItem enableInvertedCurrent: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/EnableInvertedCurrent")}
+    property VBusItem cellVoltageMin: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/CellVoltageMin")}
+    property VBusItem cellVoltageMax: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/CellVoltageMax")}
+    property VBusItem cellVoltageFloat: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/CellVoltageFloat")}
+    property VBusItem voltageMaxTime: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/VoltageMaxTime")}
+    property VBusItem voltageResetSocLimit: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/VoltageResetSocLimit")}
+    property VBusItem maxCurrentCharge: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/MaxCurrentCharge")}
+    property VBusItem maxCurrentDischarge: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/MaxCurrentDischarge")}
+    property VBusItem allowDynamicChargeCurrent: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/AllowDynamicChargeCurrent")}
+    property VBusItem allowDynamicDischargeCurrent: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/AllowDynamicDischargeCurrent")}
+    property VBusItem allowDynamicChargeVoltage: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/AllowDynamicChargeVoltage")}
+    property VBusItem socLowWarning: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/SocLowWarning")}
+    property VBusItem socLowAlarm: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/SocLowAlarm")}
+    property VBusItem capacity: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/Capacity")}
+    property VBusItem enableInvertedCurrent: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/EnableInvertedCurrent")}
 
-    property VBusItem ccmSocLimitCharge1: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/CCMSocLimitCharge1")}
-    property VBusItem ccmSocLimitCharge2: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/CCMSocLimitCharge2")}
-    property VBusItem ccmSocLimitCharge3: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/CCMSocLimitCharge3")}
-    property VBusItem ccmSocLimitDischarge1: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/CCMSocLimitDischarge1")}
-    property VBusItem ccmSocLimitDischarge2: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/CCMSocLimitDischarge2")}
-    property VBusItem ccmSocLimitDischarge3: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/CCMSocLimitDischarge3")}
-    property VBusItem ccmCurrentLimitCharge1: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/CCMCurrentLimitCharge1")}
-    property VBusItem ccmCurrentLimitCharge2: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/CCMCurrentLimitCharge2")}
-    property VBusItem ccmCurrentLimitCharge3: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/CCMCurrentLimitCharge3")}
-    property VBusItem ccmCurrentLimitDischarge1: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/CCMCurrentLimitDischarge1")}
-    property VBusItem ccmCurrentLimitDischarge2: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/CCMCurrentLimitDischarge2")}
-    property VBusItem ccmCurrentLimitDischarge3: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/serialbattery/CCMCurrentLimitDischarge3")}
+    property VBusItem ccmSocLimitCharge1: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/CCMSocLimitCharge1")}
+    property VBusItem ccmSocLimitCharge2: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/CCMSocLimitCharge2")}
+    property VBusItem ccmSocLimitCharge3: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/CCMSocLimitCharge3")}
+    property VBusItem ccmSocLimitDischarge1: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/CCMSocLimitDischarge1")}
+    property VBusItem ccmSocLimitDischarge2: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/CCMSocLimitDischarge2")}
+    property VBusItem ccmSocLimitDischarge3: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/CCMSocLimitDischarge3")}
+    property VBusItem ccmCurrentLimitCharge1: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/CCMCurrentLimitCharge1")}
+    property VBusItem ccmCurrentLimitCharge2: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/CCMCurrentLimitCharge2")}
+    property VBusItem ccmCurrentLimitCharge3: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/CCMCurrentLimitCharge3")}
+    property VBusItem ccmCurrentLimitDischarge1: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/CCMCurrentLimitDischarge1")}
+    property VBusItem ccmCurrentLimitDischarge2: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/CCMCurrentLimitDischarge2")}
+    property VBusItem ccmCurrentLimitDischarge3: VBusItem {bind: Utils.path("com.victronenergy.settings", "/Settings/Devices/Seplos/CCMCurrentLimitDischarge3")}
 
     title: service.description + " | Cell Voltages"
 
