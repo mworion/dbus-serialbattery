@@ -82,9 +82,13 @@ class SeplosBattery:
         result_alarm = self.read_alarm_data()
         if result_alarm:
             self.alarm.decode_data(result_alarm)
+        else:
+            logger.error(f"Failed to read alarm data from {self.comm.address}")
 
         result_telemetry = self.read_telemetry_data()
         if result_telemetry:
             self.telemetry.decode_data(result_telemetry)
+        else:
+            logger.error(f"Failed to read telemetry data from {self.comm.address}")
 
         return True
