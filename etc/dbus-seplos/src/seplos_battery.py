@@ -45,7 +45,7 @@ class SeplosBattery:
     def unique_identifier(self) -> str:
         """
         """
-        return f'{self.type}'
+        return self.port[self.port.rfind("/") + 1:]
 
     def product_name(self) -> str:
         """

@@ -45,24 +45,10 @@ class DBUS:
                 f'com.victronenergy.battery.{battery.unique_identifier()}',
                 get_bus())
 
-    def setup_instance(self, battery) -> tuple:
+    def get_role_instance(self, i:int) -> tuple:
         """
         """
-        bms_id = f'{battery.comm.address:02X}'
-        path = "/Settings/Devices/seplos"
-        default_instance = 'battery:1'
-        settings = {"instance": [f'{path}_{bms_id}/ClassAndVrmInstance',
-                                 default_instance, 0, 0, ]}
-
-        settings = SettingsDevice(get_bus(), settings,
-                                  self.handle_changed_setting)
-        battery.role, instance = self.get_role_instance()
-        return settings, instance
-
-    def get_role_instance(self) -> tuple:
-        """
-        """
-        val = self.settings["instance"].split(":")
+        val = self.settings[i]["instance"].split(":")
         logger.info("DeviceInstance = %d", int(val[1]))
         return val[0], int(val[1])
 
@@ -74,10 +60,26 @@ class DBUS:
             logger.info(f'Changed Instance {instance}, '
                         f'old: {old_value}, new: {new_value}')
 
-    @staticmethod
-    def setup_vedbus(dbus, battery, instance) -> bool:
+    def setup_instance(self, i:int) -> tuple:
         """
         """
+        bms_id = self.battery[i].unique_identifier()
+        path = "/Settings/Devices/seplos"
+        default_instance = 'battery:1'
+        settings = {"instance": [path + "_" + str(bms_id).replace(" ", "_") + "/ClassAndVrmInstance",
+                                 default_instance, 0, 0, ]}
+
+        self.settings[i] = SettingsDevice(get_bus(), settings,
+                                          self.handle_changed_setting)
+        self.battery[i].role, self.instance[i] = self.get_role_instance(i)
+        return
+
+    def setup_vedbus(self, i: int) -> bool:
+        """
+        """
+        dbus = self.dbusservice[i]
+        battery = self.battery[i]
+        instance = self.instance[i]
         # Create the management objects, as specified in the ccgx dbus-api document
         dbus.add_path("/Mgmt/ProcessName", __file__)
         dbus.add_path("/Mgmt/ProcessVersion", "Python " + platform.python_version())
@@ -132,7 +134,7 @@ class DBUS:
         dbus.add_path("/System/MinVoltageCellId", None, writeable=True)
         dbus.add_path("/History/ChargeCycles", None, writeable=True)
 
-        for i in range(1, battery.cell_count + 1):
+        for i in range(1, battery.alarm.number_of_cells + 1):
             dbus.add_path(f'/Voltages/Cell{i:s}', None, writeable=True,
                           gettextcallback=lambda p, v: "{:0.3f}V".format(v))
             dbus.add_path(f'/Balances/Cell{i:s}', None, writeable=True)
@@ -143,41 +145,42 @@ class DBUS:
                       gettextcallback=lambda p, v: "{:0.3f}V".format(v))
         return True
 
-    def setup_vedbus_pack(self) -> None:
+    def setup_vedbus_pack(self) -> bool:
         """
         """
         for i in range(self.number_batteries):
-            self.settings[i], self.instance[i] = self.setup_instance(self.battery[i])
-            self.setup_vedbus(self.dbusservice[i], self.battery[i], self.instance[i])
+            self.setup_instance(i)
+            self.setup_vedbus(i)
+        return True
 
-    @staticmethod
-    def publish_battery(loop, battery, error):
+    def publish_battery(self, loop, i:int):
         """
         This is called every battery.poll_interval millisecond as set up per
         battery type to read and update the data
         """
         try:
-            result = battery.refresh_data()
+            result = self.battery[i].refresh_data()
             if result:
-                error["count"] = 0
-                battery.online = True
+                self.error[i]["count"] = 0
+                self.battery[i].online = True
 
             else:
-                if error["count"] == 0:
-                    error["timestamp_first"] = int(time())
-                error["timestamp_last"] = int(time())
-                error["count"] += 1
-                time_since_first_error = (error["timestamp_last"] - error["timestamp_first"])
+                if self.error[i]["count"] == 0:
+                    self.error[i]["timestamp_first"] = int(time())
+                self.error[i]["timestamp_last"] = int(time())
+                self.error[i]["count"] += 1
+                time_since_first_error = (self.error[i]["timestamp_last"] - self.error[i]["timestamp_first"])
                 if time_since_first_error >= 60:
                     loop.quit()
 
         except Exception:
             loop.quit()
 
-    @staticmethod
-    def publish_dbus(battery, dbus):
+    def publish_dbus(self, i:int):
         """
         """
+        dbus = self.dbusservice[i]
+        battery = self.battery[i]
         dbus["/System/NrOfCellsPerBattery"] = battery.alarm.number_of_cells
         dbus["/Soc"] = round(battery.telemetry.soc, 2)
         dbus["/Dc/0/Voltage"] = round(battery.telemetry.total_pack_voltage, 2)
@@ -225,5 +228,5 @@ class DBUS:
         """
         """
         for i in range(self.number_batteries):
-            self.publish_battery(loop=loop, battery=self.battery[i], error=self.error[i])
-            self.publish_dbus(battery=self.battery[i], dbus=self.dbusservice[i])
+            self.publish_battery(loop=loop, i=i)
+            self.publish_dbus(i)
