@@ -11,7 +11,7 @@ class SeplosPack:
     """
     BATTERY_MASTER_BAUD = 9600
     BATTERY_SLAVE_BAUD = 19200
-    MAX_NUMBER_SLAVE_PACKS = 2
+    MAX_NUMBER_SLAVE_PACKS = 1
     POLL_INTERVAL = 3000
 
     def __init__(self, battery_port: str) -> None:
@@ -55,7 +55,7 @@ class SeplosPack:
         serial_if = serial.Serial(port=self.battery_port,
                                   baudrate=self.BATTERY_SLAVE_BAUD,
                                   timeout=0.5)
-        for i in range(1, self.MAX_NUMBER_SLAVE_PACKS):
+        for i in range(1, self.MAX_NUMBER_SLAVE_PACKS + 1):
             if not self.test_and_add_battery(serial_if, address=i):
                 break
         else:

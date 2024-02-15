@@ -38,11 +38,11 @@ class Comm:
         while retries > 0:
             self.serial_if.flushOutput()
             self.serial_if.flushInput()
-            time.sleep(0.1)
             self.serial_if.write(command)
             try:
                 data_raw = self.serial_if.read_until(b'\r')
                 data = data_raw[13: -5]
+                logger.debug(f"Read {data}")
             except serial.serialutil.SerialException:
                 logger.debug(f"Serial exception from {self.address}")
                 data = b''

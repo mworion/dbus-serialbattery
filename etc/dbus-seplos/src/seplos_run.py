@@ -23,7 +23,7 @@ def main():
     """
     """
     port = get_port()
-    time.sleep(10)
+    time.sleep(16)
     if not os.path.exists(port):
         logger.error(f'Port {port} does not exist')
         sys.exit(1)

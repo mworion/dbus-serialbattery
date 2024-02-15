@@ -45,11 +45,11 @@ class DBUS:
                 f'com.victronenergy.battery.{battery.unique_identifier()}',
                 get_bus())
 
-    def get_role_instance(self, i:int) -> tuple:
+    def get_role_instance(self, i: int) -> tuple:
         """
         """
         val = self.settings[i]["instance"].split(":")
-        logger.info("DeviceInstance = %d", int(val[1]))
+        # logger.info("DeviceInstance = %d", int(val[1]))
         return val[0], int(val[1])
 
     def handle_changed_setting(self, setting, old_value, new_value):
@@ -57,8 +57,8 @@ class DBUS:
         """
         if setting == "instance":
             _, instance = self.get_role_instance()
-            logger.info(f'Changed Instance {instance}, '
-                        f'old: {old_value}, new: {new_value}')
+            # logger.info(f'Changed Instance {instance}, '
+            #             f'old: {old_value}, new: {new_value}')
 
     def setup_instance(self, i: int) -> tuple:
         """
@@ -153,7 +153,7 @@ class DBUS:
             self.setup_vedbus(i)
         return True
 
-    def publish_battery(self, loop, i:int):
+    def publish_battery(self, loop, i: int):
         """
         This is called every battery.poll_interval millisecond as set up per
         battery type to read and update the data
@@ -171,12 +171,14 @@ class DBUS:
                 self.error[i]["count"] += 1
                 time_since_first_error = (self.error[i]["timestamp_last"] - self.error[i]["timestamp_first"])
                 if time_since_first_error >= 60:
+                    logger.error(f"Timeout for too mny errors")
                     loop.quit()
 
         except Exception:
+            logger.error(f"Error in publish_battery")
             loop.quit()
 
-    def publish_dbus(self, i:int):
+    def publish_dbus(self, i: int):
         """
         """
         dbus = self.dbusservice[i]
@@ -230,3 +232,5 @@ class DBUS:
         for i in range(self.number_batteries):
             self.publish_battery(loop=loop, i=i)
             self.publish_dbus(i)
+
+        return True

@@ -1,59 +1,73 @@
 import QtQuick 1.1
 import com.victron.velib 1.0
+import "utils.js" as Utils
 
 MbPage {
-	id: root
+        id: root
+        property string bindPrefix
 
-	property variant service
+        model: VisibleItemModel {
+                MbSubMenu {
+                        id: battery
+                        description: qsTr("Battery bank")
+                        subpage: Component {
+                                PageBatterySettingsBattery {
+                                        title: battery.description
+                                        bindPrefix: root.bindPrefix
+                                }
+                        }
+                }
 
-	property VBusItem chargeModeDebug: VBusItem { bind: service.path("/Info/ChargeModeDebug") }
+                MbSubMenu {
+                        id: alarms
+                        description: qsTr("Alarms")
+                        subpage: Component {
+                                PageBatterySettingsAlarm {
+                                        title: alarms.description
+                                        bindPrefix: root.bindPrefix
+                                }
+                        }
+                }
 
-	model: VisibleItemModel {
+                MbSubMenu {
+                        id: relay
+                        description: qsTr("Relay (on battery monitor)")
+                        subpage: Component {
+                                PageBatterySettingsRelay {
+                                        title: relay.description
+                                        bindPrefix: root.bindPrefix
+                                }
+                        }
+                }
 
-        MbItemValue {
-            description: qsTr("Charge Mode")
-            item.bind: service.path("/Info/ChargeMode")
-            show: item.valid
+                MbItemOptions {
+                        description: qsTr("Restore factory defaults")
+                        bind: Utils.path(root.bindPrefix, "/Settings/RestoreDefaults")
+                        text: qsTr("Press to restore")
+                        show: valid
+                        possibleValues: [
+                                MbOption { description: qsTr("Cancel"); value: 0 },
+                                MbOption { description: qsTr("Restore"); value: 1 }
+                        ]
+                }
+
+                MbItemNoYes {
+                        description: qsTr("Bluetooth Enabled")
+                        bind: Utils.path(bindPrefix, "/Settings/BluetoothMode")
+                        show: valid
+                }
+
+
+                MbSpinBox {
+                        description: "Reset SoC to"
+                        item.bind: Utils.path(bindPrefix, "/Settings/ResetSoc")
+                        item.min: 0
+                        item.max: 100
+                        item.step: 1
+                }
+
+
+
+
         }
-
-		// show debug informations
-		MbItemText {
-			text: chargeModeDebug.value
-			wrapMode: Text.WordWrap
-			show: chargeModeDebug.value != ""
-		}
-
-		MbItemValue {
-			description: qsTr("Charge Voltage Limit (CVL)")
-			item.bind: service.path("/Info/MaxChargeVoltage")
-		}
-
-        MbItemValue {
-            description: qsTr("Charge Limitation")
-            item.bind: service.path("/Info/ChargeLimitation")
-            show: item.valid
-        }
-
-		MbItemValue {
-			description: qsTr("Charge Current Limit (CCL)")
-			item.bind: service.path("/Info/MaxChargeCurrent")
-		}
-
-        MbItemValue {
-            description: qsTr("Discharge Limitation")
-            item.bind: service.path("/Info/DischargeLimitation")
-            show: item.valid
-        }
-
-		MbItemValue {
-			description: qsTr("Discharge Current Limit (DCL)")
-			item.bind: service.path("/Info/MaxDischargeCurrent")
-		}
-
-		MbItemValue {
-			description: qsTr("Low Voltage Disconnect (always ignored)")
-			item.bind: service.path("/Info/BatteryLowVoltage")
-			showAccessLevel: User.AccessService
-		}
-	}
 }

@@ -21,7 +21,7 @@ class SeplosBattery:
     def __init__(self, comm: Comm, port: str) -> None:
         """
         """
-        self.type = self.BATTERY_TYPE + f"{comm.address}"
+        self.type = self.BATTERY_TYPE + f"-{comm.address}"
         self.port = port
         self.role = "battery"
         self.comm = comm
@@ -40,7 +40,7 @@ class SeplosBattery:
     def custom_name(self) -> str:
         """
         """
-        return f'Seplos ({self.type})'
+        return f'Seplos (MW-{self.comm.address})'
 
     def unique_identifier(self) -> str:
         """
@@ -50,7 +50,7 @@ class SeplosBattery:
     def product_name(self) -> str:
         """
         """
-        return f'{self.BATTERY_TYPE}-MW'
+        return f'{self.type}'
 
     def read_telemetry_data(self):
         """
