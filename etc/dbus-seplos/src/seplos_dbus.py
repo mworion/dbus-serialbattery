@@ -11,7 +11,7 @@ sys.path.insert(1, os.path.join(os.path.dirname(__file__),
 
 from vedbus import VeDbusService
 from settingsdevice import SettingsDevice
-from seplos_utils import logger, DRIVER_VERSION
+from seplos_utils import logger, DRIVER_VERSION, roundSec
 
 # Victron packages
 
@@ -182,10 +182,10 @@ class DBUS:
         dbus = self.dbusservice[i]
         battery = self.battery[i]
         dbus["/System/NrOfCellsPerBattery"] = battery.alarm.number_of_cells
-        dbus["/Soc"] = round(battery.telemetry.soc, 2)
-        dbus["/Dc/0/Voltage"] = round(battery.telemetry.total_pack_voltage, 2)
-        dbus["/Dc/0/Current"] = round(battery.telemetry.dis_charge_current, 2)
-        dbus["/Dc/0/Power"] = round(battery.telemetry.dis_charge_power, 2)
+        dbus["/Soc"] = roundSec(battery.telemetry.soc, 2)
+        dbus["/Dc/0/Voltage"] = roundSec(battery.telemetry.total_pack_voltage, 2)
+        dbus["/Dc/0/Current"] = roundSec(battery.telemetry.dis_charge_current, 2)
+        dbus["/Dc/0/Power"] = roundSec(battery.telemetry.dis_charge_power, 2)
         dbus["/Dc/0/Temperature"] = battery.telemetry.environ_temperature
         dbus["/Capacity"] = battery.telemetry.battery_capacity
         dbus["/History/ChargeCycles"] = battery.telemetry.cycles

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from seplos_protocol import int_from_ascii
+from seplos_utils import roundSec
 
 
 class Telemetry:
@@ -33,8 +34,8 @@ class Telemetry:
         self.lowest_cell_voltage: float = None
         self.highest_cell_vid: int = None
         self.highest_cell_voltage: float = None
-        self.lowest_cell_temperature: int = None
-        self.lowest_cell_voltage: float = None
+        self.lowest_cell_tid: int = None
+        self.lowest_cell_temperature: float = None
         self.highest_cell_tid: int = None
         self.highest_cell_temperature: float = None
         self.min_pack_voltage: float = None
@@ -85,12 +86,12 @@ class Telemetry:
             voltage = int_from_ascii(data, cell_voltage_offset + i * 4) / 1000
             self.cell_voltage[i] = voltage
 
-        self.average_cell_voltage = round((sum(self.cell_voltage)
-                                           / len(self.cell_voltage)), 3)
+        self.average_cell_voltage = roundSec((sum(self.cell_voltage)
+                                              / len(self.cell_voltage)), 3)
 
         self.lowest_cell_vid, self.lowest_cell_voltage = self.get_lowest_cell_voltage()
         self.highest_cell_vid, self.highest_cell_voltage = self.get_highest_cell_voltage()
-        self.delta_cell_voltage = round((self.highest_cell_voltage - self.lowest_cell_voltage), 3)
+        self.delta_cell_voltage = roundSec((self.highest_cell_voltage - self.lowest_cell_voltage), 3)
 
         for i in range(0, 4):
             temp = (int_from_ascii(data, temps_offset + i * 4) - 2731) / 10
@@ -100,7 +101,7 @@ class Telemetry:
         self.power_temperature = (int_from_ascii(data, temps_offset + 5 * 4) - 2731) / 10
         self.dis_charge_current = int_from_ascii(data, dis_charge_current_offset, signed=True) / 100
         self.total_pack_voltage = int_from_ascii(data, total_pack_voltage_offset) / 100
-        self.dis_charge_power = round((self.dis_charge_current * self.total_pack_voltage), 3)
+        self.dis_charge_power = roundSec((self.dis_charge_current * self.total_pack_voltage), 3)
         self.rated_capacity = int_from_ascii(data, rated_capacity_offset) / 100
         self.battery_capacity = int_from_ascii(data, battery_capacity_offset) / 100
         self.residual_capacity = int_from_ascii(data, residual_capacity_offset) / 100

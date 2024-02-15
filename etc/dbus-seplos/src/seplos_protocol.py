@@ -31,8 +31,6 @@ def int_from_ascii(data: bytes, offset: int, signed=False, size=4) -> int:
     except Exception as e:
         logger.error(f'Error {e}')
         return 0
-    if int_chunk is None:
-        return 0
     return int_chunk
 
 

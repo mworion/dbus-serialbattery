@@ -9,7 +9,7 @@ from seplos_utils import logger
 class SeplosBattery:
     """
     """
-    BATTERY_TYPE = "seplos"
+    BATTERY_TYPE = "Seplos"
     HARDWARE_VERSION = 'v2'
 
     CID1 = 0x46                 # Lithium iron phosphate battery BMS
@@ -40,7 +40,7 @@ class SeplosBattery:
     def custom_name(self) -> str:
         """
         """
-        return f'Seplos({self.type})'
+        return f'Seplos ({self.type})'
 
     def unique_identifier(self) -> str:
         """
@@ -50,7 +50,7 @@ class SeplosBattery:
     def product_name(self) -> str:
         """
         """
-        return f'{self.type}'
+        return f'{self.BATTERY_TYPE}-MW'
 
     def read_telemetry_data(self):
         """

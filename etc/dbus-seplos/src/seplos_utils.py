@@ -17,3 +17,11 @@ logging.basicConfig(level=logging.DEBUG,
                     )
 
 logger = logging.getLogger('Seplos')
+
+
+def roundSec(value: float, digits: int) -> float:
+    """
+    """
+    if value is None:
+        return None
+    return round(value, digits)
