@@ -57,8 +57,7 @@ class DBUS:
         """
         if setting == "instance":
             _, instance = self.get_role_instance()
-            # logger.info(f'Changed Instance {instance}, '
-            #             f'old: {old_value}, new: {new_value}')
+            logger.info(f'Changed DeviceInstance = {self.instance:d}')
 
     def setup_instance(self, i: int) -> tuple:
         """
@@ -153,30 +152,33 @@ class DBUS:
             self.setup_vedbus(i)
         return True
 
-    def publish_battery(self, loop, i: int):
+    def publish_battery(self, main_loop, i: int):
         """
         This is called every battery.poll_interval millisecond as set up per
         battery type to read and update the data
         """
         try:
             result = self.battery[i].refresh_data()
-            if result:
-                self.error[i]["count"] = 0
-                self.battery[i].online = True
-
-            else:
-                if self.error[i]["count"] == 0:
-                    self.error[i]["timestamp_first"] = int(time())
-                self.error[i]["timestamp_last"] = int(time())
-                self.error[i]["count"] += 1
-                time_since_first_error = (self.error[i]["timestamp_last"] - self.error[i]["timestamp_first"])
-                if time_since_first_error >= 60:
-                    logger.error(f"Timeout for too mny errors")
-                    loop.quit()
-
+            logger.debug(f"Refresh data {result}")
         except Exception:
             logger.error(f"Error in publish_battery")
-            loop.quit()
+            main_loop.quit()
+            return False
+
+        if result:
+            self.error[i]["count"] = 0
+            self.battery[i].online = True
+
+        else:
+            if self.error[i]["count"] == 0:
+                self.error[i]["timestamp_first"] = int(time())
+            self.error[i]["timestamp_last"] = int(time())
+            self.error[i]["count"] += 1
+            time_since_first_error = (self.error[i]["timestamp_last"] - self.error[i]["timestamp_first"])
+            if time_since_first_error >= 60:
+                logger.error(f"Timeout for too mny errors")
+                main_loop.quit()
+        return True
 
     def publish_dbus(self, i: int):
         """
@@ -224,13 +226,14 @@ class DBUS:
             dbus["/Voltages/Diff"] = battery.telemetry.delta_cell_voltage
 
         except Exception:
+            logger.error(f"Error in publish_dbus cell voltages")
             pass
 
-    def publish_battery_pack(self, loop):
+    def publish_battery_pack(self, main_loop):
         """
         """
+        logger.debug(f"Publish battery pack")
         for i in range(self.number_batteries):
-            self.publish_battery(loop=loop, i=i)
+            self.publish_battery(main_loop=main_loop, i=i)
             self.publish_dbus(i)
-
         return True
