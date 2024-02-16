@@ -9,8 +9,9 @@ from seplos_utils import logger
 class SeplosBattery:
     """
     """
-    BATTERY_TYPE = "Seplos"
-    HARDWARE_VERSION = 'v2'
+    PRODUCT = "EEL Battery"
+    PRODUCT_ID = "001"
+    HARDWARE_VERSION = "none"
 
     CID1 = 0x46                 # Lithium iron phosphate battery BMS
     TELEMETRY = 0x42            # Acquisition of telemetering information
@@ -21,12 +22,10 @@ class SeplosBattery:
     def __init__(self, comm: Comm, port: str) -> None:
         """
         """
-        self.type = self.BATTERY_TYPE + f"-{comm.address}"
         self.port = port
         self.role = "battery"
         self.comm = comm
         self.online = True
-        self.hardware_version = self.HARDWARE_VERSION
         self.max_battery_charge_current = 200
         self.max_battery_discharge_current = 200
         self.alarm = Alarm()
@@ -40,7 +39,7 @@ class SeplosBattery:
     def custom_name(self) -> str:
         """
         """
-        return f'Seplos (MW-{self.comm.address})'
+        return f'Seplos {self.comm.address})'
 
     def unique_identifier(self) -> str:
         """
@@ -50,7 +49,20 @@ class SeplosBattery:
     def product_name(self) -> str:
         """
         """
-        return f'{self.type}'
+        if self.comm.address == 0:
+            return f'{self.PRODUCT} Master'
+        else:
+            return f'{self.PRODUCT} Slave {self.comm.address}'
+
+    def product_id(self) -> str:
+        """
+        """
+        return f'{self.PRODUCT_ID}'
+
+    def hardware_version(self) -> str:
+        """
+        """
+        return f'{self.HARDWARE_VERSION}'
 
     def read_telemetry_data(self):
         """

@@ -11,7 +11,7 @@ class Telemetry:
 
     def __init__(self):
         # from pack
-
+        self.number_of_cells: int = None
         self.cell_voltage = [None] * 16
         self.temperature = [None] * 4
         self.environ_temperature: float = None
@@ -27,7 +27,6 @@ class Telemetry:
         self.port_voltage: float = None
 
         # calculated
-
         self.average_cell_voltage: float = None
         self.delta_cell_voltage: float = None
         self.lowest_cell_vid: int = None
@@ -54,7 +53,7 @@ class Telemetry:
 
     def get_lowest_cell_temperature(self) -> tuple:
         lowest_cell = self.temperature.index(min(self.temperature))
-        lowest_cell_temp = self.cell_voltage[lowest_cell]
+        lowest_cell_temp = self.temperature[lowest_cell]
         return lowest_cell, lowest_cell_temp
 
     def get_highest_cell_temperature(self) -> tuple:
@@ -77,14 +76,17 @@ class Telemetry:
         cycles_offset = 122
         soh_offset = 126
         port_voltage_offset = 130
-        number_of_cells = int_from_ascii(data=data, offset=4, size=2)
+        self.number_of_cells = int_from_ascii(data=data, offset=4, size=2)
 
-        self.min_pack_voltage = self.MIN_CELL_VOLTAGE * number_of_cells
-        self.max_pack_voltage = self.MAX_CELL_VOLTAGE * number_of_cells
+        self.min_pack_voltage = self.MIN_CELL_VOLTAGE * self.number_of_cells
+        self.max_pack_voltage = self.MAX_CELL_VOLTAGE * self.number_of_cells
 
-        for i in range(number_of_cells):
+        for i in range(self.number_of_cells):
             voltage = int_from_ascii(data, cell_voltage_offset + i * 4) / 1000
             self.cell_voltage[i] = voltage
+        for i in range(0, 4):
+            temp = (int_from_ascii(data, temps_offset + i * 4) - 2731) / 10
+            self.temperature[i] = temp
 
         self.average_cell_voltage = roundSec((sum(self.cell_voltage)
                                               / len(self.cell_voltage)), 3)
@@ -93,19 +95,22 @@ class Telemetry:
         self.highest_cell_vid, self.highest_cell_voltage = self.get_highest_cell_voltage()
         self.delta_cell_voltage = roundSec((self.highest_cell_voltage - self.lowest_cell_voltage), 3)
 
-        for i in range(0, 4):
-            temp = (int_from_ascii(data, temps_offset + i * 4) - 2731) / 10
-            self.temperature[i] = temp
+        self.lowest_cell_tid, self.lowest_cell_temperature = self.get_lowest_cell_temperature()
+        self.highest_cell_tid, self.highest_cell_temperature = self.get_highest_cell_temperature()
 
         self.environ_temperature = (int_from_ascii(data, temps_offset + 4 * 4) - 2731) / 10
         self.power_temperature = (int_from_ascii(data, temps_offset + 5 * 4) - 2731) / 10
+
         self.dis_charge_current = int_from_ascii(data, dis_charge_current_offset, signed=True) / 100
         self.total_pack_voltage = int_from_ascii(data, total_pack_voltage_offset) / 100
         self.dis_charge_power = roundSec((self.dis_charge_current * self.total_pack_voltage), 3)
+
         self.rated_capacity = int_from_ascii(data, rated_capacity_offset) / 100
         self.battery_capacity = int_from_ascii(data, battery_capacity_offset) / 100
         self.residual_capacity = int_from_ascii(data, residual_capacity_offset) / 100
+
         self.soc = int_from_ascii(data, soc_offset) / 10
         self.cycles = int_from_ascii(data, cycles_offset)
         self.soh = int_from_ascii(data, soh_offset) / 10
+
         self.port_voltage = int_from_ascii(data, port_voltage_offset) / 100

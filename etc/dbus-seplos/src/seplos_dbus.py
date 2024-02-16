@@ -57,7 +57,7 @@ class DBUS:
         """
         if setting == "instance":
             _, instance = self.get_role_instance()
-            logger.info(f'Changed DeviceInstance = {self.instance:d}')
+            logger.info(f'Changed DeviceInstance = {instance:d}')
 
     def setup_instance(self, i: int) -> tuple:
         """
@@ -86,23 +86,25 @@ class DBUS:
 
         # Create the mandatory objects
         dbus.add_path("/DeviceInstance", instance)
-        dbus.add_path("/ProductId", 0x0)
+        dbus.add_path("/ProductId", battery.product_id())
         dbus.add_path("/ProductName", battery.product_name())
         dbus.add_path("/FirmwareVersion", DRIVER_VERSION)
-        dbus.add_path("/HardwareVersion", battery.hardware_version)
+        dbus.add_path("/HardwareVersion", battery.hardware_version())
         dbus.add_path("/Connected", 1)
         dbus.add_path("/Seplos", battery.unique_identifier(), writeable=True)
         dbus.add_path("/DeviceName", battery.custom_name(), writeable=True)
+        dbus.add_path("/CustomName", battery.custom_name(), writeable=True)
 
         # Create static battery info
         dbus.add_path("/System/NrOfCellsPerBattery", battery.alarm.number_of_cells, writeable=True)
         dbus.add_path("/System/NrOfModulesOnline", 1, writeable=True)
         dbus.add_path("/System/NrOfModulesOffline", 0, writeable=True)
         dbus.add_path("/Capacity", battery.telemetry.battery_capacity,
-                      writeable=True, gettextcallback=lambda p, v: "{:0.2f}Ah".format(v))
+                      writeable=True, gettextcallback=lambda p, v: "{:0.0f}Ah".format(v))
         dbus.add_path("/InstalledCapacity", battery.telemetry.rated_capacity,
                       writeable=True, gettextcallback=lambda p, v: "{:0.0f}Ah".format(v))
         dbus.add_path("/Soc", None, writeable=True)
+        dbus.add_path("/Soh", None, writeable=True)
         dbus.add_path("/Dc/0/Voltage", None, writeable=True,
                       gettextcallback=lambda p, v: "{:2.2f}V".format(v))
         dbus.add_path("/Dc/0/Current", None, writeable=True,
@@ -133,10 +135,10 @@ class DBUS:
         dbus.add_path("/System/MinVoltageCellId", None, writeable=True)
         dbus.add_path("/History/ChargeCycles", None, writeable=True)
 
-        for i in range(1, battery.alarm.number_of_cells + 1):
-            dbus.add_path(f'/Voltages/Cell{i:s}', None, writeable=True,
+        for i in range(1, battery.telemetry.number_of_cells + 1):
+            dbus.add_path(f'/Voltages/Cell{i}', None, writeable=True,
                           gettextcallback=lambda p, v: "{:0.3f}V".format(v))
-            dbus.add_path(f'/Balances/Cell{i:s}', None, writeable=True)
+            dbus.add_path(f'/Balances/Cell{i}', None, writeable=True)
 
         dbus.add_path("/Voltages/Sum", None, writeable=True,
                       gettextcallback=lambda p, v: "{:2.2f}V".format(v))
@@ -148,6 +150,7 @@ class DBUS:
         """
         """
         for i in range(self.number_batteries):
+            self.battery[i].refresh_data()
             self.setup_instance(i)
             self.setup_vedbus(i)
         return True
@@ -186,13 +189,14 @@ class DBUS:
         dbus = self.dbusservice[i]
         battery = self.battery[i]
         dbus["/System/NrOfCellsPerBattery"] = battery.alarm.number_of_cells
-        dbus["/Soc"] = roundSec(battery.telemetry.soc, 2)
+        dbus["/Soc"] = roundSec(battery.telemetry.soc, 1)
+        dbus["/Soh"] = roundSec(battery.telemetry.soh, 1)
+        dbus["/History/ChargeCycles"] = battery.telemetry.cycles
         dbus["/Dc/0/Voltage"] = roundSec(battery.telemetry.total_pack_voltage, 2)
         dbus["/Dc/0/Current"] = roundSec(battery.telemetry.dis_charge_current, 2)
         dbus["/Dc/0/Power"] = roundSec(battery.telemetry.dis_charge_power, 2)
         dbus["/Dc/0/Temperature"] = battery.telemetry.environ_temperature
         dbus["/Capacity"] = battery.telemetry.battery_capacity
-        dbus["/History/ChargeCycles"] = battery.telemetry.cycles
         dbus["/System/NrOfModulesOnline"] = 1
         dbus["/System/NrOfModulesOffline"] = 0
         dbus["/System/MinCellTemperature"] = battery.telemetry.lowest_cell_temperature
@@ -216,10 +220,10 @@ class DBUS:
         # cell voltages
         try:
             voltageSum = 0
-            for i in range(battery.alarm.number_of_cells):
-                voltage = battery.telemetry.cell_voltage[i]
-                dbus[f'/Voltages/Cell{i:s}'] = voltage
-                dbus[f'/Balances/Cell{i:s}'] = battery.alarm.cell_equalization[i]
+            for i in range(1, battery.telemetry.number_of_cells + 1):
+                voltage = battery.telemetry.cell_voltage[i - 1]
+                dbus[f'/Voltages/Cell{i}'] = voltage
+                dbus[f'/Balances/Cell{i}'] = battery.alarm.cell_equalization[i - 1]
                 if voltage:
                     voltageSum += voltage
             dbus["/Voltages/Sum"] = voltageSum

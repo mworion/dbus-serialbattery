@@ -119,7 +119,7 @@ class Alarm:
 
     def decode_data(self, data: bytes) -> None:
         # number of cells
-        number_of_cells = bytes.fromhex(data.decode("ascii"))[2]
+        self.number_of_cells = bytes.fromhex(data.decode("ascii"))[2]
 
         # info 24 byte alarm offsets
         cell_warning_byte_offset = 3
@@ -146,8 +146,7 @@ class Alarm:
         warning_8_alarm_byte_offset = 42
 
         # info data
-        self.number_of_cells = number_of_cells
-        for i in range(number_of_cells):
+        for i in range(self.number_of_cells):
             self.cell_voltage_warning[i] = self.stat_24byte_alarm(
                 data=data, offset=cell_warning_byte_offset + i)
 
@@ -266,7 +265,7 @@ class Alarm:
             data=data, offset=power_status_byte_offset, on_off_bit=3)
 
         # equalization status 1 + 2
-        for i in range(number_of_cells):
+        for i in range(self.number_of_cells):
             on_off_bit = i % 8
             offset = equalization_status1_byte_offset if i < 8 else equalization_status2_byte_offset
             self.cell_equalization[i] = self.stat_20bit_alarm(
@@ -284,7 +283,7 @@ class Alarm:
         self.power_off = self.stat_20bit_alarm(
             data=data, offset=system_status_byte_offset, on_off_bit=5)
         # disconnection status 1 + 2
-        for i in range(number_of_cells):
+        for i in range(self.number_of_cells):
             warn_bit = i % 8
             offset = disconnection_status1_byte_offset if i < 8 else disconnection_status2_byte_offset
             self.cell_disconnection[i] = self.stat_20bit_alarm(

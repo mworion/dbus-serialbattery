@@ -36,14 +36,6 @@ def main():
         logger.error('No batteries found')
         sys.exit(1)
 
-    for i in range(10):
-        for seplos_battery in seplos_pack.seplos_batteries:
-            time.sleep(1)
-            seplos_battery.refresh_data()
-            print(seplos_battery.telemetry.cell_voltage)
-
-    sys.exit(0)
-
     DBusGMainLoop(set_as_default=True)
     main_loop = gobject.MainLoop()
     helper = DBUS(seplos_pack)
