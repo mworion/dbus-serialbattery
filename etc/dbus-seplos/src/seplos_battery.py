@@ -39,7 +39,7 @@ class SeplosBattery:
     def custom_name(self) -> str:
         """
         """
-        return f'Seplos {self.comm.address})'
+        return f'Seplos {self.comm.address}'
 
     def unique_identifier(self) -> str:
         """

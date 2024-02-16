@@ -93,7 +93,7 @@ class DBUS:
         dbus.add_path("/Connected", 1)
         dbus.add_path("/Seplos", battery.unique_identifier(), writeable=True)
         dbus.add_path("/DeviceName", battery.custom_name(), writeable=True)
-        dbus.add_path("/CustomName", battery.custom_name(), writeable=True)
+        # dbus.add_path("/CustomName", battery.custom_name(), writeable=True)
 
         # Create static battery info
         dbus.add_path("/System/NrOfCellsPerBattery", battery.alarm.number_of_cells, writeable=True)
