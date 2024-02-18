@@ -9,7 +9,7 @@ from seplos_utils import logger
 class SeplosBattery:
     """
     """
-    PRODUCT = "EEL Battery"
+    PRODUCT = "Seplos BMS"
     PRODUCT_ID = "001"
     HARDWARE_VERSION = "none"
 
@@ -18,6 +18,10 @@ class SeplosBattery:
     TELEMETRY_LENGTH = 150
     ALARM = 0x44                # Acquisition of telecommand information
     ALARM_LENGTH = 98
+    PROTOCOL = 0x4F             # Protocol version
+    PROTOCOL_LENGTH = 0
+    VENDOR = 0x4F               # Vendor Data
+    VENDOR_LENGTH = 30
 
     def __init__(self, comm: Comm, port: str) -> None:
         """
@@ -63,6 +67,35 @@ class SeplosBattery:
         """
         """
         return f'{self.HARDWARE_VERSION}'
+
+    def read_protocol_data(self):
+        """
+        ~  2  0  0  0  4  6  4  F  0  0  0  0  F  D  9  A  $
+        ~  2  0  0  0  4  6  0  0  0  0  0  0  F  D  B  4  $
+        """
+        info = f'{self.comm.address:02X}'.encode()
+        command = encode_cmd(address=self.comm.address, cid1=self.CID1,
+                             cid2=self.PROTOCOL, info=info)
+        data = self.comm.read_serial_data(command, self.PROTOCOL_LENGTH)
+        if not data:
+            logger.error(f"Failed to read protocol data from {self.comm.address}")
+            return False
+        return data
+
+    def read_vendor_data(self):
+        """
+        ~  2  0  0  0  4  6  5  1  0  0  0  0  F  D  A  E  $
+        ~  2  0  0  0  4  6  0  0  C  0  4  0  3  1  3  1  3  0  3  1  2  D  4  C  4  E  3  1  3  2  2  0  1  0  0  6  4  3  4  1  4  E  3  A  5  6  6  9  6  3  7  4  7  2  6  F  6  E  2  0  2  0  2  0  2  0  2  0  2  0  2  0  2  0  2  0  F  0  7  D  $
+        ~  2  0  0  0  4  6  0  0  C  0  4  0  3  1  3  1  3  0  3  1  2  D  4  C  4  E  3  1  3  2  2  0  1  0  0  6  4  3  4  1  4  E  3  A  5  6  6  9  6  3  7  4  7  2  6  F  6  E  2  0  2  0  2  0  2  0  2  0  2  0  2  0  2  0  2  0  F  0  7  D  $
+        """
+        info = f'{self.comm.address:02X}'.encode()
+        command = encode_cmd(address=self.comm.address, cid1=self.CID1,
+                             cid2=self.VENDOR, info=info)
+        data = self.comm.read_serial_data(command, self.VENDOR_LENGTH)
+        if not data:
+            logger.error(f"Failed to read vendor data from {self.comm.address}")
+            return False
+        return data
 
     def read_telemetry_data(self):
         """

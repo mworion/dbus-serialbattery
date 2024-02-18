@@ -27,13 +27,15 @@ class SeplosPack:
         """
         """
         comm = Comm(serial_if, address)
-        test_result = comm.test_connection()
-        if test_result:
-            self.seplos_batteries.append(SeplosBattery(comm, port=self.battery_port))
+        battery = SeplosBattery(comm, port=self.battery_port)
+        protocol_data = battery.read_protocol_data()
+        if protocol_data is not None:
+            self.seplos_batteries.append(battery)
             logger.debug(f"Connected to battery {address}")
+            return True
         else:
             logger.debug(f"Failed to connect to battery {address}")
-        return test_result
+            return False
 
     def check_master(self) -> bool:
         """

@@ -15,21 +15,6 @@ class Comm:
         self.serial_if = serial_if
         self.address = address
 
-    def test_connection(self):
-        """
-        Calling cid2=0x00 is invalid. We wait if the result is OK.
-        """
-        try:
-            command = encode_cmd(address=self.address, cid1=0x46, cid2=0x00)
-            response = self.read_serial_data(command, response_length=0)
-        except serial.SerialTimeoutException:
-            logger.debug(f"Timeout from {self.address}")
-            return False
-        except Exception as err:
-            logger.debug(f"Unexpected {err=}")
-            return False
-        return response == b''
-
     def read_serial_data(self, command: bytes, response_length: int):
         """
         """

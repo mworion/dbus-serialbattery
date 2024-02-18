@@ -44,6 +44,7 @@ class DBUS:
             self.dbusservice[i] = VeDbusService(
                 f'com.victronenergy.battery.{battery.unique_identifier()}',
                 get_bus())
+            logger.info(f"ID: {battery.unique_identifier()} generated")
 
     def get_role_instance(self, i: int) -> tuple:
         """
@@ -65,8 +66,8 @@ class DBUS:
         bms_id = self.battery[i].unique_identifier()
         path = "/Settings/Devices/Seplos"
         default_instance = 'battery:1'
-        settings = {"instance": [path + "_" + str(bms_id).replace(" ", "_") + "/ClassAndVrmInstance",
-                                 default_instance, 0, 0, ]}
+        settings = {"instance": [path + "_" + bms_id + "/ClassAndVrmInstance",
+                                 default_instance, 0, 0]}
 
         self.settings[i] = SettingsDevice(get_bus(), settings,
                                           self.handle_changed_setting)
