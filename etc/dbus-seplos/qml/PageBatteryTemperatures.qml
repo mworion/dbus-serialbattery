@@ -13,7 +13,8 @@ MbPage {
             show: item.valid
             item {
                 bind: service.path("/Dc/0/Temperature")
-                displayUnit: user.temperatureUnit
+                unit: "°C"
+                decimals: 1
             }
         }
         MbItemValue {
@@ -21,31 +22,40 @@ MbPage {
             show: item.valid
             item {
                 bind: service.path("/System/MOSFET_Temperature")
-                displayUnit: user.temperatureUnit
+                unit: "°C"
+                decimals: 1
             }
         }
 		MbItemValue {
 			description: qsTr("Temperature 1")
 			item {
 				bind: Utils.path(root.bindPrefix, "/System/Temperature1")
+                unit: "°C"
+                decimals: 1
 			}
 		}
 		MbItemValue {
 			description: qsTr("Temperature 2")
 			item {
 				bind: Utils.path(root.bindPrefix, "/System/Temperature2")
+                unit: "°C"
+                decimals: 1
 			}
 		}
 		MbItemValue {
 			description: qsTr("Temperature 3")
 			item {
 				bind: Utils.path(root.bindPrefix, "/System/Temperature3")
+                unit: "°C"
+                decimals: 1
 			}
 		}
 		MbItemValue {
 			description: qsTr("Temperature 4")
 			item {
 				bind: Utils.path(root.bindPrefix, "/System/Temperature4")
+                unit: "°C"
+                decimals: 1
 			}
 		}
     }

@@ -130,15 +130,6 @@ MbPage {
         }
 
         MbItemValue {
-            description: qsTr("MOSFET temperature")
-            show: item.valid
-            item {
-                bind: service.path("/System/MOSFET_Temperature")
-                displayUnit: user.temperatureUnit
-            }
-        }
-
-        MbItemValue {
             description: qsTr("Air temperature")
             item {
                 bind: service.path("/AirTemperature")
