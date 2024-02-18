@@ -23,15 +23,13 @@ class Comm:
         while retries > 0:
             self.serial_if.flushOutput()
             self.serial_if.flushInput()
-            # logger.debug(f"Send: {command}")
             self.serial_if.write(command)
             try:
                 data_raw = self.serial_if.read_until(b'\r')
                 data = data_raw[13: -5]
-                # logger.debug(f"Data: {data_raw}")
 
             except serial.serialutil.SerialException:
-                logger.debug(f"Serial exception from {self.address}")
+                logger.debug(f'Serial exception from {self.address}')
                 continue
 
             else:
@@ -49,5 +47,5 @@ class Comm:
         if retries > 0:
             return True, data
         else:
-            logger.debug(f"Exceeded retries from {self.address}")
+            logger.debug(f'Exceeded retries from {self.address}')
             return False, data

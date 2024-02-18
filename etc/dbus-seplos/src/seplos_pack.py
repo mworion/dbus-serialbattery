@@ -31,15 +31,15 @@ class SeplosPack:
         ok, protocol_data = battery.read_protocol_data()
         if ok:
             self.seplos_batteries.append(battery)
-            logger.debug(f"Connected to battery {address}")
+            logger.debug(f'Connected to battery {address}')
         else:
-            logger.debug(f"Failed to connect to battery {address}")
+            logger.debug(f'Failed to connect to battery {address}')
         return ok
 
     def check_master(self) -> bool:
         """
         """
-        logger.debug(f"Test master battery at {self.battery_port}")
+        logger.debug(f'Test master battery at {self.battery_port}')
         serial_if = serial.Serial(port=self.battery_port,
                                   baudrate=self.BATTERY_MASTER_BAUD,
                                   timeout=.5)
@@ -53,7 +53,7 @@ class SeplosPack:
     def check_slave(self) -> bool:
         """
         """
-        logger.debug(f"Test slave battery at {self.battery_port}")
+        logger.debug(f'Test slave battery at {self.battery_port}')
         serial_if = serial.Serial(port=self.battery_port,
                                   baudrate=self.BATTERY_SLAVE_BAUD,
                                   timeout=0.5)

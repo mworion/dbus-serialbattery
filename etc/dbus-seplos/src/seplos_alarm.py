@@ -95,31 +95,40 @@ class Alarm:
                          warn_bit: int = None, protection_bit: int = None) -> str:
         """
         """
-        data_byte = bytes.fromhex(data.decode("ascii"))[offset]
+        data_byte = bytes.fromhex(data.decode('ascii'))[offset]
         if on_off_bit is not None:
-            return "on" if data_byte & (1 << on_off_bit) != 0 else "off"
+            return 'on' if data_byte & (1 << on_off_bit) != 0 else 'off'
         elif warn_bit is not None:
             if data_byte & (1 << warn_bit) != 0:
-                return "warning"
+                return 'warning'
             if protection_bit is not None and data_byte & (1 << protection_bit) != 0:
-                return "protection"
-            return "normal"
+                return 'protection'
+            return 'normal'
 
     @staticmethod
     def stat_24byte_alarm(data: bytes, offset: int) -> str:
-        alarm_type = bytes.fromhex(data.decode("ascii"))[offset]
+        """
+        """
+        alarm_type = bytes.fromhex(data.decode('ascii'))[offset]
         if alarm_type == 0:
-            return "normal"
+            return 'normal'
         elif alarm_type == 1:
-            return "trigger_low"
+            return 'trigger_low'
         elif alarm_type == 2:
-            return "trigger_high"
+            return 'trigger_high'
         else:
-            return "trigger_other"
+            return 'trigger_other'
+
+    def get_number_connected_cells(self) -> int:
+        """
+        """
+        return sum(1 for x in self.cell_disconnection if x == 'normal')
 
     def decode_data(self, data: bytes) -> None:
+        """
+        """
         # number of cells
-        self.number_of_cells = bytes.fromhex(data.decode("ascii"))[2]
+        self.number_of_cells = bytes.fromhex(data.decode('ascii'))[2]
 
         # info 24 byte alarm offsets
         cell_warning_byte_offset = 3

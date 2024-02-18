@@ -6,7 +6,7 @@ MbPage {
     id: root
 	property string bindPrefix
 
-    title: service.description + " | Cell Temperatures"
+    title: service.description + " - Temperatures"
     model: VisibleItemModel {
         MbItemValue {
             description: qsTr("Battery Box temperature")
@@ -27,7 +27,7 @@ MbPage {
             }
         }
 		MbItemValue {
-			description: qsTr("Cell Temperature 1")
+			description: qsTr("Cell temperature 1")
 			item {
 				bind: Utils.path(root.bindPrefix, "/System/Temperature1")
                 unit: "°C"
@@ -35,7 +35,7 @@ MbPage {
 			}
 		}
 		MbItemValue {
-			description: qsTr("Cell Temperature 2")
+			description: qsTr("Cell temperature 2")
 			item {
 				bind: Utils.path(root.bindPrefix, "/System/Temperature2")
                 unit: "°C"
@@ -43,7 +43,7 @@ MbPage {
 			}
 		}
 		MbItemValue {
-			description: qsTr("Cell Temperature 3")
+			description: qsTr("Cell temperature 3")
 			item {
 				bind: Utils.path(root.bindPrefix, "/System/Temperature3")
                 unit: "°C"
@@ -51,7 +51,7 @@ MbPage {
 			}
 		}
 		MbItemValue {
-			description: qsTr("Cell Temperature 4")
+			description: qsTr("Cell temperature 4")
 			item {
 				bind: Utils.path(root.bindPrefix, "/System/Temperature4")
                 unit: "°C"

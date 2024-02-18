@@ -67,11 +67,11 @@ def is_valid_frame(data: bytes) -> bool:
 
     checksum = get_checksum(data[1:-5])
     if checksum != int_from_ascii(data, offset=-5, size=4):
-        logger.debug(f"Checksum error")
+        logger.debug(f'Checksum error')
         return False
 
     if cid2 != b'00':
-        logger.debug(f"Error: {RETURN_CODE_CID2.get(int(cid2, 16), 'Unknown error')}")
+        logger.debug(f'Error: {RETURN_CODE_CID2.get(int(cid2, 16), "Unknown error")}')
         return False
 
     return True

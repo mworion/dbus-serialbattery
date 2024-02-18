@@ -9,9 +9,9 @@ from seplos_utils import logger
 class SeplosBattery:
     """
     """
-    PRODUCT = "Seplos BMS"
+    PRODUCT = 'Seplos BMS'
     PRODUCT_ID = 1
-    HARDWARE_VERSION = "001"
+    HARDWARE_VERSION = '001'
 
     CID1 = 0x46                 # Lithium iron phosphate battery BMS
     TELEMETRY = 0x42            # Acquisition of telemetering information
@@ -27,7 +27,7 @@ class SeplosBattery:
         """
         """
         self.port = port
-        self.role = "battery"
+        self.role = 'battery'
         self.comm = comm
         self.online = True
         self.max_battery_charge_current = 200
@@ -38,7 +38,7 @@ class SeplosBattery:
     def connection_name(self) -> str:
         """
         """
-        return self.port[self.port.rfind("/") + 1:]
+        return self.port[self.port.rfind('/') + 1:]
 
     def custom_name(self) -> str:
         """
@@ -48,7 +48,7 @@ class SeplosBattery:
     def unique_identifier(self) -> str:
         """
         """
-        return self.port[self.port.rfind("/") + 1:]
+        return f'DIP{self.comm.address:02X}'
 
     def product_name(self) -> str:
         """
@@ -78,7 +78,7 @@ class SeplosBattery:
                              cid2=self.PROTOCOL, info=info)
         ok, data = self.comm.read_serial_data(command, self.PROTOCOL_LENGTH)
         if not ok:
-            logger.error(f"Failed to read protocol data from {self.comm.address}")
+            logger.error(f'Failed to read protocol data from {self.comm.address}')
         return ok, data
 
     def read_vendor_data(self):
@@ -92,7 +92,7 @@ class SeplosBattery:
                              cid2=self.VENDOR, info=info)
         ok, data = self.comm.read_serial_data(command, self.VENDOR_LENGTH)
         if not ok:
-            logger.error(f"Failed to read vendor data from {self.comm.address}")
+            logger.error(f'Failed to read vendor data from {self.comm.address}')
         return ok, data
 
     def read_telemetry_data(self):
@@ -103,7 +103,7 @@ class SeplosBattery:
                              cid2=self.TELEMETRY, info=info)
         ok, data = self.comm.read_serial_data(command, self.TELEMETRY_LENGTH)
         if not ok:
-            logger.error(f"Failed to read telemetry data from {self.comm.address}")
+            logger.error(f'Failed to read telemetry data from {self.comm.address}')
         return ok, data
 
     def get_telemetry(self) -> bool:
@@ -122,7 +122,7 @@ class SeplosBattery:
                              cid2=self.ALARM, info=info)
         ok, data = self.comm.read_serial_data(command, self.ALARM_LENGTH)
         if not ok:
-            logger.error(f"Failed to read alarm data from {self.comm.address}")
+            logger.error(f'Failed to read alarm data from {self.comm.address}')
         return ok, data
 
     def get_alarm(self) -> bool:
