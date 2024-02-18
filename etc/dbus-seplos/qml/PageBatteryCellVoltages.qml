@@ -78,18 +78,18 @@ MbPage {
     property string c22: _b22.valid && _b22.text == "1" ? "#ff0000" : style.borderColor
     property string c23: _b23.valid && _b23.text == "1" ? "#ff0000" : style.borderColor
     property string c24: _b24.valid && _b24.text == "1" ? "#ff0000" : style.borderColor
-    title: service.description + " | Cell Voltages"
+    title: service.description + " | Cell Voltages / Balance"
 
     model: VisibleItemModel {
 
         MbItemRow {
-            description: qsTr("Cells Sum")
+            description: qsTr("Cells Voltage Sum")
             values: [
                 MbTextBlock { item { bind: service.path("/Voltages/Sum") } width: 70; height: 25 }
             ]
         }
         MbItemRow {
-            description: qsTr("Cells (Min/Max/Diff)")
+            description: qsTr("Cells (Min..Max..Diff)")
             values: [
                 MbTextBlock { item { bind: service.path("/System/MinCellVoltage") } width: 70; height: 25 },
                 MbTextBlock { item { bind: service.path("/System/MaxCellVoltage") } width: 70; height: 25 },
@@ -97,7 +97,7 @@ MbPage {
             ]
         }
         MbItemRow {
-            description: qsTr("Cells (1/2/3/4)")
+            description: qsTr("Cells (1...4)")
             values: [
                 MbTextBlock { item: volt1; width: 70; height: 25; color: c1 },
                 MbTextBlock { item: volt2; width: 70; height: 25; color: c2 },
@@ -106,7 +106,7 @@ MbPage {
             ]
         }
         MbItemRow {
-            description: qsTr("Cells (5/6/7/8)")
+            description: qsTr("Cells (5...8)")
             show: volt5.valid
             values: [
                 MbTextBlock { item: volt5; width: 70; height: 25; color: c5 },
@@ -116,7 +116,7 @@ MbPage {
             ]
         }
         MbItemRow {
-            description: qsTr("Cells (9/10/11/12)")
+            description: qsTr("Cells (9...12)")
             show: volt9.valid
             values: [
                 MbTextBlock { item: volt9; width: 70; height: 25; color: c9 },
@@ -126,7 +126,7 @@ MbPage {
             ]
         }
         MbItemRow {
-            description: qsTr("Cells (13/14/15/16)")
+            description: qsTr("Cells (13...16)")
             show: volt13.valid
             values: [
                 MbTextBlock { item: volt13; width: 70; height: 25; color: c13 },
@@ -136,23 +136,13 @@ MbPage {
             ]
         }
         MbItemRow {
-            description: qsTr("Cells (17/18/19/20)")
+            description: qsTr("Cells (17...20)")
             show: volt17.valid
             values: [
                 MbTextBlock { item: volt17; width: 70; height: 25; color: c17 },
                 MbTextBlock { item: volt18; width: 70; height: 25; color: c18 },
                 MbTextBlock { item: volt19; width: 70; height: 25; color: c19 },
                 MbTextBlock { item: volt20; width: 70; height: 25; color: c20 }
-            ]
-        }
-        MbItemRow {
-            description: qsTr("Cells (21/22/23/24)")
-            show: volt21.valid
-            values: [
-                MbTextBlock { item: volt21; width: 70; height: 25; color: c21 },
-                MbTextBlock { item: volt22; width: 70; height: 25; color: c22 },
-                MbTextBlock { item: volt23; width: 70; height: 25; color: c23 },
-                MbTextBlock { item: volt24; width: 70; height: 25; color: c24 }
             ]
         }
     }

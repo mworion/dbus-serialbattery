@@ -18,7 +18,7 @@ class Telemetry:
         self.power_temperature: float = None
         self.dis_charge_current: float = None
         self.total_pack_voltage: float = None
-        self.residual_capacity: float = None
+        self.remain_capacity: float = None
         self.battery_capacity: float = None
         self.soc: float = None
         self.rated_capacity: float = None
@@ -69,7 +69,7 @@ class Telemetry:
         temps_offset = 72
         dis_charge_current_offset = 96
         total_pack_voltage_offset = 100
-        residual_capacity_offset = 104
+        remain_capacity_offset = 104
         battery_capacity_offset = 110
         soc_offset = 114
         rated_capacity_offset = 118
@@ -107,7 +107,7 @@ class Telemetry:
 
         self.rated_capacity = int_from_ascii(data, rated_capacity_offset) / 100
         self.battery_capacity = int_from_ascii(data, battery_capacity_offset) / 100
-        self.residual_capacity = int_from_ascii(data, residual_capacity_offset) / 100
+        self.remain_capacity = int_from_ascii(data, remain_capacity_offset) / 100
 
         self.soc = int_from_ascii(data, soc_offset) / 10
         self.cycles = int_from_ascii(data, cycles_offset)

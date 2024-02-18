@@ -2,7 +2,7 @@
 import sys
 import os
 import platform
-from time import time
+import time
 from typing import Union
 import dbus
 
@@ -33,7 +33,6 @@ class DBUS:
         self.number_batteries = len(pack.seplos_batteries)
         self.battery = [None] * self.number_batteries
         self.settings = [None] * self.number_batteries
-        self.instance = [None] * self.number_batteries
         self.error = [None] * self.number_batteries
         self.dbusservice = [None] * self.number_batteries
 
@@ -44,7 +43,6 @@ class DBUS:
             self.dbusservice[i] = VeDbusService(
                 f'com.victronenergy.battery.{battery.unique_identifier()}',
                 get_bus())
-            logger.info(f"ID: {battery.unique_identifier()} generated")
 
     def get_role_instance(self, i: int) -> tuple:
         """
@@ -71,7 +69,7 @@ class DBUS:
 
         self.settings[i] = SettingsDevice(get_bus(), settings,
                                           self.handle_changed_setting)
-        self.battery[i].role, self.instance[i] = self.get_role_instance(i)
+        self.battery[i].role, _ = self.get_role_instance(i)
         return
 
     def setup_vedbus(self, i: int) -> bool:
@@ -79,7 +77,7 @@ class DBUS:
         """
         dbus = self.dbusservice[i]
         battery = self.battery[i]
-        instance = self.instance[i]
+        _, instance = self.get_role_instance(i)
         # Create the management objects, as specified in the ccgx dbus-api document
         dbus.add_path("/Mgmt/ProcessName", __file__)
         dbus.add_path("/Mgmt/ProcessVersion", "Python " + platform.python_version())
@@ -97,12 +95,12 @@ class DBUS:
         # dbus.add_path("/CustomName", battery.custom_name(), writeable=True)
 
         # Create static battery info
-        dbus.add_path("/System/NrOfCellsPerBattery", battery.alarm.number_of_cells, writeable=True)
+        dbus.add_path("/System/NrOfCellsPerBattery", battery.telemetry.number_of_cells, writeable=True)
         dbus.add_path("/System/NrOfModulesOnline", 1, writeable=True)
         dbus.add_path("/System/NrOfModulesOffline", 0, writeable=True)
-        dbus.add_path("/Capacity", battery.telemetry.battery_capacity,
+        dbus.add_path("/Capacity", battery.telemetry.remain_capacity,
                       writeable=True, gettextcallback=lambda p, v: "{:0.0f}Ah".format(v))
-        dbus.add_path("/InstalledCapacity", battery.telemetry.rated_capacity,
+        dbus.add_path("/InstalledCapacity", battery.telemetry.battery_capacity,
                       writeable=True, gettextcallback=lambda p, v: "{:0.0f}Ah".format(v))
         dbus.add_path("/Soc", None, writeable=True)
         dbus.add_path("/Soh", None, writeable=True)
@@ -151,7 +149,9 @@ class DBUS:
         """
         """
         for i in range(self.number_batteries):
-            if self.battery[i].get_telemetry():
+            ok = self.battery[i].get_telemetry()
+            time.sleep(0.1)
+            if ok:
                 self.setup_instance(i)
                 self.setup_vedbus(i)
         return True
@@ -163,7 +163,6 @@ class DBUS:
         """
         try:
             result = self.battery[i].get_all()
-            logger.debug(f"Refresh data {result}")
         except Exception:
             logger.error(f"Error in publish_battery")
             main_loop.quit()
@@ -175,8 +174,8 @@ class DBUS:
 
         else:
             if self.error[i]["count"] == 0:
-                self.error[i]["timestamp_first"] = int(time())
-            self.error[i]["timestamp_last"] = int(time())
+                self.error[i]["timestamp_first"] = int(time.time())
+            self.error[i]["timestamp_last"] = int(time.time())
             self.error[i]["count"] += 1
             time_since_first_error = (self.error[i]["timestamp_last"] - self.error[i]["timestamp_first"])
             if time_since_first_error >= 60:
@@ -189,7 +188,7 @@ class DBUS:
         """
         dbus = self.dbusservice[i]
         battery = self.battery[i]
-        dbus["/System/NrOfCellsPerBattery"] = battery.alarm.number_of_cells
+        dbus["/System/NrOfCellsPerBattery"] = battery.telemetry.number_of_cells
         dbus["/Soc"] = roundSec(battery.telemetry.soc, 1)
         dbus["/Soh"] = roundSec(battery.telemetry.soh, 1)
         dbus["/History/ChargeCycles"] = battery.telemetry.cycles
@@ -197,7 +196,7 @@ class DBUS:
         dbus["/Dc/0/Current"] = roundSec(battery.telemetry.dis_charge_current, 2)
         dbus["/Dc/0/Power"] = roundSec(battery.telemetry.dis_charge_power, 2)
         dbus["/Dc/0/Temperature"] = battery.telemetry.environ_temperature
-        dbus["/Capacity"] = battery.telemetry.battery_capacity
+        dbus["/Capacity"] = battery.telemetry.remain_capacity
         dbus["/System/NrOfModulesOnline"] = 1
         dbus["/System/NrOfModulesOffline"] = 0
         dbus["/System/MinCellTemperature"] = battery.telemetry.lowest_cell_temperature
@@ -237,7 +236,6 @@ class DBUS:
     def publish_battery_pack(self, main_loop):
         """
         """
-        logger.debug(f"Publish battery pack")
         for i in range(self.number_batteries):
             self.publish_battery(main_loop=main_loop, i=i)
             self.publish_dbus(i)

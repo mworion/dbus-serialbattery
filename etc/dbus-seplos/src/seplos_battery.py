@@ -10,8 +10,8 @@ class SeplosBattery:
     """
     """
     PRODUCT = "Seplos BMS"
-    PRODUCT_ID = "001"
-    HARDWARE_VERSION = "none"
+    PRODUCT_ID = 1
+    HARDWARE_VERSION = "001"
 
     CID1 = 0x46                 # Lithium iron phosphate battery BMS
     TELEMETRY = 0x42            # Acquisition of telemetering information
@@ -58,10 +58,10 @@ class SeplosBattery:
         else:
             return f'{self.PRODUCT} Slave {self.comm.address}'
 
-    def product_id(self) -> str:
+    def product_id(self) -> int:
         """
         """
-        return f'{self.PRODUCT_ID}'
+        return self.PRODUCT_ID
 
     def hardware_version(self) -> str:
         """
