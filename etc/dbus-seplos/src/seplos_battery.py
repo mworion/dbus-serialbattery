@@ -70,8 +70,6 @@ class SeplosBattery:
 
     def read_protocol_data(self):
         """
-        ~  2  0  0  0  4  6  4  F  0  0  0  0  F  D  9  A  $
-        ~  2  0  0  0  4  6  0  0  0  0  0  0  F  D  B  4  $
         """
         info = f'{self.comm.address:02X}'.encode()
         command = encode_cmd(address=self.comm.address, cid1=self.CID1,
@@ -83,9 +81,8 @@ class SeplosBattery:
 
     def read_vendor_data(self):
         """
-        ~  2  0  0  0  4  6  5  1  0  0  0  0  F  D  A  E  $
-        ~  2  0  0  0  4  6  0  0  C  0  4  0  3  1  3  1  3  0  3  1  2  D  4  C  4  E  3  1  3  2  2  0  1  0  0  6  4  3  4  1  4  E  3  A  5  6  6  9  6  3  7  4  7  2  6  F  6  E  2  0  2  0  2  0  2  0  2  0  2  0  2  0  2  0  2  0  F  0  7  D  $
-        ~  2  0  0  0  4  6  0  0  C  0  4  0  3  1  3  1  3  0  3  1  2  D  4  C  4  E  3  1  3  2  2  0  1  0  0  6  4  3  4  1  4  E  3  A  5  6  6  9  6  3  7  4  7  2  6  F  6  E  2  0  2  0  2  0  2  0  2  0  2  0  2  0  2  0  2  0  F  0  7  D  $
+        Is ASCII string
+        1102-LN12..CAN:Victron
         """
         info = f'{self.comm.address:02X}'.encode()
         command = encode_cmd(address=self.comm.address, cid1=self.CID1,
