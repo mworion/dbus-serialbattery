@@ -117,7 +117,7 @@ class DBUS:
         dbus.add_path("/System/MinTemperatureCellId", None, writeable=True)
         dbus.add_path("/System/MaxCellTemperature", None, writeable=True)
         dbus.add_path("/System/MaxTemperatureCellId", None, writeable=True)
-        dbus.add_path("/System/MOSTemperature", None, writeable=True)
+        dbus.add_path("/System/MOSFET_Temperature", None, writeable=True)
         dbus.add_path("/System/Temperature1", None, writeable=True)
         dbus.add_path("/System/Temperature1Name", None, writeable=True)
         dbus.add_path("/System/Temperature2", None, writeable=True)
@@ -203,7 +203,7 @@ class DBUS:
         dbus["/System/MinTemperatureCellId"] = battery.telemetry.lowest_cell_tid
         dbus["/System/MaxCellTemperature"] = battery.telemetry.highest_cell_temperature
         dbus["/System/MaxTemperatureCellId"] = battery.telemetry.highest_cell_tid
-        dbus["/System/MOSTemperature"] = battery.telemetry.power_temperature
+        dbus["/System/MOSFET_Temperature"] = battery.telemetry.power_temperature
         dbus["/System/Temperature1"] = battery.telemetry.temperature[0]
         dbus["/System/Temperature1Name"] = 'Temp 1'
         dbus["/System/Temperature2"] = battery.telemetry.temperature[1]

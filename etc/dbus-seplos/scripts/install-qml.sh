@@ -12,6 +12,8 @@ fi
 cp /data/etc/dbus-seplos/qml/PageBattery.qml /opt/victronenergy/gui/qml/
 # copy new PageBatteryCellVoltages
 cp /data/etc/dbus-seplos/qml/PageBatteryCellVoltages.qml /opt/victronenergy/gui/qml/
+# copy new PageBatteryTemperatures
+cp /data/etc/dbus-seplos/qml/PageBatteryTemperatures.qml /opt/victronenergy/gui/qml/
 
 
 
