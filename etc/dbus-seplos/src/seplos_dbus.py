@@ -205,13 +205,9 @@ class DBUS:
         dbus['/System/MaxTemperatureCellId'] = battery.telemetry.highest_cell_tid
         dbus['/System/MOSFET_Temperature'] = battery.telemetry.power_temperature
         dbus['/System/Temperature1'] = battery.telemetry.temperature[0]
-        dbus['/System/Temperature1Name'] = 'Temp 1'
         dbus['/System/Temperature2'] = battery.telemetry.temperature[1]
-        dbus['/System/Temperature2Name'] = 'Temp 2'
         dbus['/System/Temperature3'] = battery.telemetry.temperature[2]
-        dbus['/System/Temperature3Name'] = 'Temp 3'
         dbus['/System/Temperature4'] = battery.telemetry.temperature[3]
-        dbus['/System/Temperature4Name'] = 'Temp 4'
         dbus['/System/MinVoltageCellId'] = battery.telemetry.lowest_cell_vid
         dbus['/System/MaxVoltageCellId'] = battery.telemetry.highest_cell_vid
         dbus['/System/MinCellVoltage'] = battery.telemetry.lowest_cell_voltage
