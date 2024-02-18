@@ -9,7 +9,7 @@ MbPage {
     title: service.description + " | Cell Temperatures"
     model: VisibleItemModel {
         MbItemValue {
-            description: qsTr("Box temperature")
+            description: qsTr("Battery Box temperature")
             show: item.valid
             item {
                 bind: service.path("/Dc/0/Temperature")
@@ -27,7 +27,7 @@ MbPage {
             }
         }
 		MbItemValue {
-			description: qsTr("Temperature 1")
+			description: qsTr("Cell Temperature 1")
 			item {
 				bind: Utils.path(root.bindPrefix, "/System/Temperature1")
                 unit: "°C"
@@ -35,7 +35,7 @@ MbPage {
 			}
 		}
 		MbItemValue {
-			description: qsTr("Temperature 2")
+			description: qsTr("Cell Temperature 2")
 			item {
 				bind: Utils.path(root.bindPrefix, "/System/Temperature2")
                 unit: "°C"
@@ -43,7 +43,7 @@ MbPage {
 			}
 		}
 		MbItemValue {
-			description: qsTr("Temperature 3")
+			description: qsTr("Cell Temperature 3")
 			item {
 				bind: Utils.path(root.bindPrefix, "/System/Temperature3")
                 unit: "°C"
@@ -51,7 +51,7 @@ MbPage {
 			}
 		}
 		MbItemValue {
-			description: qsTr("Temperature 4")
+			description: qsTr("Cell Temperature 4")
 			item {
 				bind: Utils.path(root.bindPrefix, "/System/Temperature4")
                 unit: "°C"

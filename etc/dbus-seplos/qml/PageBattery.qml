@@ -121,7 +121,7 @@ MbPage {
         }
 
         MbItemValue {
-            description: qsTr("Battery temperature")
+            description: qsTr("Battery Box temperature")
             show: item.valid
             item {
                 bind: service.path("/Dc/0/Temperature")
