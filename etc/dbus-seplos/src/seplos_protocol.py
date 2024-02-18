@@ -65,10 +65,6 @@ def is_valid_frame(data: bytes) -> bool:
     if cid2 == b'04':
         return True
 
-    if len(data) < 18:
-        logger.debug(f"Frame too short")
-        return False
-
     checksum = get_checksum(data[1:-5])
     if checksum != int_from_ascii(data, offset=-5, size=4):
         logger.debug(f"Checksum error")

@@ -151,9 +151,9 @@ class DBUS:
         """
         """
         for i in range(self.number_batteries):
-            self.battery[i].refresh_data()
-            self.setup_instance(i)
-            self.setup_vedbus(i)
+            if self.battery[i].get_telemetry():
+                self.setup_instance(i)
+                self.setup_vedbus(i)
         return True
 
     def publish_battery(self, main_loop, i: int):
@@ -162,7 +162,7 @@ class DBUS:
         battery type to read and update the data
         """
         try:
-            result = self.battery[i].refresh_data()
+            result = self.battery[i].get_all()
             logger.debug(f"Refresh data {result}")
         except Exception:
             logger.error(f"Error in publish_battery")

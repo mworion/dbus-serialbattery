@@ -76,11 +76,10 @@ class SeplosBattery:
         info = f'{self.comm.address:02X}'.encode()
         command = encode_cmd(address=self.comm.address, cid1=self.CID1,
                              cid2=self.PROTOCOL, info=info)
-        data = self.comm.read_serial_data(command, self.PROTOCOL_LENGTH)
-        if not data:
+        ok, data = self.comm.read_serial_data(command, self.PROTOCOL_LENGTH)
+        if not ok:
             logger.error(f"Failed to read protocol data from {self.comm.address}")
-            return False
-        return data
+        return ok, data
 
     def read_vendor_data(self):
         """
@@ -91,11 +90,10 @@ class SeplosBattery:
         info = f'{self.comm.address:02X}'.encode()
         command = encode_cmd(address=self.comm.address, cid1=self.CID1,
                              cid2=self.VENDOR, info=info)
-        data = self.comm.read_serial_data(command, self.VENDOR_LENGTH)
-        if not data:
+        ok, data = self.comm.read_serial_data(command, self.VENDOR_LENGTH)
+        if not ok:
             logger.error(f"Failed to read vendor data from {self.comm.address}")
-            return False
-        return data
+        return ok, data
 
     def read_telemetry_data(self):
         """
@@ -103,11 +101,18 @@ class SeplosBattery:
         info = f'{self.comm.address:02X}'.encode()
         command = encode_cmd(address=self.comm.address, cid1=self.CID1,
                              cid2=self.TELEMETRY, info=info)
-        data = self.comm.read_serial_data(command, self.TELEMETRY_LENGTH)
-        if not data:
+        ok, data = self.comm.read_serial_data(command, self.TELEMETRY_LENGTH)
+        if not ok:
             logger.error(f"Failed to read telemetry data from {self.comm.address}")
-            return False
-        return data
+        return ok, data
+
+    def get_telemetry(self) -> bool:
+        """
+        """
+        ok, result_telemetry = self.read_telemetry_data()
+        if ok:
+            self.telemetry.decode_data(result_telemetry)
+        return ok
 
     def read_alarm_data(self):
         """
@@ -115,21 +120,22 @@ class SeplosBattery:
         info = f'{self.comm.address:02X}'.encode()
         command = encode_cmd(address=self.comm.address, cid1=self.CID1,
                              cid2=self.ALARM, info=info)
-        data = self.comm.read_serial_data(command, self.ALARM_LENGTH)
-        if not data:
+        ok, data = self.comm.read_serial_data(command, self.ALARM_LENGTH)
+        if not ok:
             logger.error(f"Failed to read alarm data from {self.comm.address}")
-            return False
-        return data
+        return ok, data
 
-    def refresh_data(self):
+    def get_alarm(self) -> bool:
         """
         """
-        result_alarm = self.read_alarm_data()
-        if result_alarm:
+        ok, result_alarm = self.read_alarm_data()
+        if ok:
             self.alarm.decode_data(result_alarm)
+        return ok
 
-        result_telemetry = self.read_telemetry_data()
-        if result_telemetry:
-            self.telemetry.decode_data(result_telemetry)
-
-        return True
+    def get_all(self) -> bool:
+        """
+        """
+        got_telemetry = self.get_telemetry()
+        got_alarm = self.get_alarm()
+        return got_telemetry and got_alarm

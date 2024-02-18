@@ -35,11 +35,11 @@ class Comm:
                 continue
 
             else:
+                if not is_valid_length(data, response_length):
+                    continue
                 if not is_valid_frame(data=data_raw):
                     continue
                 if not is_valid_hex_string(data):
-                    continue
-                if not is_valid_length(data, response_length):
                     continue
                 break
 
@@ -47,7 +47,7 @@ class Comm:
                 retries -= 1
 
         if retries > 0:
-            return data
+            return True, data
         else:
             logger.debug(f"Exceeded retries from {self.address}")
-            return False
+            return False, data
